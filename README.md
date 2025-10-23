@@ -1,78 +1,160 @@
 # 🚀 Coding Kickstarter
 
-A modern Next.js application with Supabase backend and AI API integration.
+A webapp for beginner coders to kickstart their journey with AI-generated coding prompts and setup guides. Fun, creative, and beginner-friendly, it offers tailored ideas to practice coding in a relaxed "vibe" style.
 
-## 📦 What's Installed?
+**Built with:** Next.js 16, TypeScript, Tailwind CSS, Supabase, OpenAI/Grok API
 
-- **Next.js 16** - React framework for web apps
-- **TypeScript** - JavaScript with type safety
-- **Tailwind CSS** - Beautiful styling
-- **Supabase** - Backend database & auth
-- **Axios** - HTTP requests for APIs
+---
 
-## 🔧 Setup Instructions
+## 🌟 Features
 
-### 1. Prerequisites
-- ✅ Node.js (v18+) - Already installed!
-- ✅ npm (v9+) - Already installed!
+- **AI-Powered Setup Guides**: Generate beginner-friendly setup steps for any project idea
+- **Vibe Coding Mode**: Encourages creative, stress-free coding sessions
+- **Kanban Boards**: Visualize project structure and tasks
+- **PDF Export**: Download setup guides and plans
+- **Beginner-Friendly**: Simple, intuitive UI for new developers
 
-### 2. Start Development Server
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js v20+ (v22.20.0 tested)
+- npm v10+
+- Supabase account (free tier works!)
+- OpenAI or Grok API key
+
+### Quick Setup
+
+1. **Clone and install:**
+```bash
+git clone https://github.com/Dave1524/coding_kickstarter.git
+cd coding_kickstarter
+npm install
+```
+
+2. **Configure environment:**
+Create `.env.local`:
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+OPENAI_API_KEY=sk-proj-your-key
+GROK_API_KEY=your-grok-key
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+3. **Start development:**
 ```bash
 npm run dev
 ```
+
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### 3. Configure Environment Variables
-1. Create a Supabase project at [supabase.com](https://supabase.com)
-2. Copy your project URL and API key
-3. Edit `.env.local` and paste your credentials:
-```
-NEXT_PUBLIC_SUPABASE_URL=your_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key
-```
+---
 
-### 4. Set Up AI APIs
-- Get an OpenAI API key from [platform.openai.com](https://platform.openai.com)
-- Add to `.env.local`:
-```
-NEXT_PUBLIC_OPENAI_API_KEY=your_key
-```
-
-## 📚 Basic File Structure
+## 📚 Project Structure
 
 ```
 coding_kickstarter/
-├── app/              # Main application code
-│   ├── page.tsx      # Home page
-│   └── layout.tsx    # Shared layout
-├── lib/              # Helper functions
-│   └── supabase.ts   # Database setup
-├── public/           # Images, fonts
-├── .env.local        # Your secrets (don't commit!)
-└── package.json      # Your dependencies
+├── app/
+│   ├── page.tsx              # Home page (input form)
+│   ├── output/page.tsx       # Results page (steps + kanban)
+│   ├── api/
+│   │   └── generate/route.ts # AI generation endpoint
+│   └── layout.tsx
+├── components/
+│   ├── Form.tsx              # Input form component
+│   ├── Steps.tsx             # Display setup steps
+│   ├── Kanban.tsx            # Task board
+│   └── PDFExport.tsx         # PDF export button
+├── lib/
+│   ├── supabaseClient.ts     # Supabase initialization
+│   └── ai.ts                 # AI API calls
+├── .env.local                # Your secrets (gitignored!)
+└── package.json
 ```
 
-## 📖 Useful Commands
+---
 
+## 🛠️ Development
+
+**Available Commands:**
 ```bash
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Run production build
-npm start
-
-# Check for errors
-npm run lint
-
-# Format code
-npm run format
+npm run dev       # Start development server
+npm run build     # Build for production
+npm start         # Run production build
+npm run lint      # Check code quality
+npm run format    # Format code with Prettier
 ```
 
-## 🆘 Need Help?
+---
 
-- [Next.js Docs](https://nextjs.org/docs)
-- [Supabase Docs](https://supabase.com/docs)
-- [Tailwind CSS](https://tailwindcss.com)
+## 📖 Workflow
+
+1. **Input**: User enters project idea (e.g., "Todo app for 100 users")
+2. **AI Generation**: System asks 3-4 clarifying questions
+3. **Output**: 
+   - Top 5 setup steps
+   - Kanban board with tasks
+   - Scalability recommendations
+   - PDF export option
+
+---
+
+## 🔐 Security
+
+- ✅ API keys stored in `.env.local` (gitignored)
+- ✅ Supabase RLS policies protect data
+- ✅ Server-side API routes for sensitive operations
+- ⚠️ Never commit `.env.local`!
+
+---
+
+## 🚀 Deployment
+
+**Deploy to Vercel (recommended):**
+
+1. Push to GitHub
+2. Go to [vercel.com](https://vercel.com)
+3. Import this repository
+4. Add environment variables in Vercel dashboard
+5. Auto-deploys on `git push`!
+
+---
+
+## 📝 Sample Use Cases
+
+- "Todo app for 100 users"
+- "Chat app with real-time messaging"
+- "E-commerce store with payments"
+- "Weather app using public APIs"
+
+---
+
+## 🤝 Contributing
+
+We love contributions! To contribute:
+
+1. Fork the repo
+2. Create a feature branch: `git checkout -b feature/your-feature`
+3. Commit: `git commit -m 'Add your feature'`
+4. Push: `git push origin feature/your-feature`
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+MIT License - see LICENSE file for details
+
+---
+
+## 💬 Contact & Support
+
+- **Issues**: [GitHub Issues](https://github.com/Dave1524/coding_kickstarter/issues)
+- **Questions?** Reach out on GitHub or open a discussion!
+
+---
+
+**Happy coding! 🎉 Join us in making coding accessible to everyone.**
