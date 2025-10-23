@@ -1,36 +1,40 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Initialize Supabase client
-// This connects your app to your Supabase database
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+// Get environment variables
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-// Example: Fetch data from a table
-export async function fetchUsers() {
-  const { data, error } = await supabase
-    .from('users')
-    .select('*');
-  
-  if (error) {
-    console.error('Error fetching users:', error);
-    return null;
-  }
-  
-  return data;
+// Validate that we have the required env vars
+if (!supabaseUrl) {
+  throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL environment variable');
 }
 
-// Example: Insert new data
-export async function createUser(email: string, name: string) {
-  const { data, error } = await supabase
-    .from('users')
-    .insert([{ email, name }]);
-  
-  if (error) {
-    console.error('Error creating user:', error);
-    return null;
+if (!supabaseAnonKey) {
+  throw new Error('Missing NEXT_PUBLIC_SUPABASE_ANON_KEY environment variable');
+}
+
+// Create and export Supabase client
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+// Test connection function
+export async function testConnection() {
+  try {
+    const { data, error } = await supabase.from('_test').select('*').limit(1);
+    
+    if (error && error.code === 'PGRST204') {
+      // Table doesn't exist, but connection works!
+      return { success: true, message: 'Connected to Supabase! (No tables yet)' };
+    }
+    
+    if (error) {
+      return { success: false, message: error.message };
+    }
+    
+    return { success: true, message: 'Connected to Supabase!', data };
+  } catch (err) {
+    return { 
+      success: false, 
+      message: err instanceof Error ? err.message : 'Unknown error' 
+    };
   }
-  
-  return data;
 }
