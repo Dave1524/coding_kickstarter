@@ -19,12 +19,17 @@ export async function GET() {
     if (result.success) {
       return NextResponse.json({
         status: 'success',
-        message: '✅ Supabase connection successful!',
-        details: result.message,
+        message: result.message,
+        details: result.details || 'Connection verified!',
+        nextSteps: [
+          'Your Supabase connection is working!',
+          'Next: Create database tables in Supabase dashboard',
+          'Then: Build your AI-powered setup guide generator'
+        ],
         env: {
           hasUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
           hasKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-          urlPrefix: process.env.NEXT_PUBLIC_SUPABASE_URL?.substring(0, 20) + '...'
+          urlPrefix: process.env.NEXT_PUBLIC_SUPABASE_URL?.substring(0, 30) + '...'
         }
       }, { status: 200 });
     } else {

@@ -19,18 +19,25 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 // Test connection function
 export async function testConnection() {
   try {
+    // Try to query a non-existent table to test connection
     const { data, error } = await supabase.from('_test').select('*').limit(1);
     
-    if (error && error.code === 'PGRST204') {
-      // Table doesn't exist, but connection works!
-      return { success: true, message: 'Connected to Supabase! (No tables yet)' };
+    // If we get a "table not found" error, connection is working!
+    if (error && (error.code === 'PGRST204' || error.message.includes('not find the table'))) {
+      return { 
+        success: true, 
+        message: 'Connected to Supabase! ✅',
+        details: 'Your database is empty (no tables yet), but the connection works perfectly!'
+      };
     }
     
+    // Any other error means connection issue
     if (error) {
-      return { success: false, message: error.message };
+      return { success: false, message: error.message, code: error.code };
     }
     
-    return { success: true, message: 'Connected to Supabase!', data };
+    // If we actually got data, connection definitely works
+    return { success: true, message: 'Connected to Supabase! ✅', data };
   } catch (err) {
     return { 
       success: false, 
