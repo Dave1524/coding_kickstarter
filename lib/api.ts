@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 
 // Helper function to call OpenAI API
 export async function callOpenAI(prompt: string) {
@@ -26,16 +26,18 @@ export async function callOpenAI(prompt: string) {
 }
 
 // Generic API call helper
-export async function fetchAPI(url: string, options: any = {}) {
+export async function fetchAPI<T = unknown>(url: string, options: AxiosRequestConfig = {}) {
   try {
-    const response = await axios.get(url, {
+    const response = await axios({
+      method: 'get',
+      url,
+      ...options,
       headers: {
         'Content-Type': 'application/json',
-        ...options.headers,
+        ...(options.headers ?? {}),
       },
-      ...options,
     });
-    return response.data;
+    return response.data as T;
   } catch (error) {
     console.error('API Error:', error);
     throw error;
