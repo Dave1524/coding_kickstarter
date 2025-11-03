@@ -22,11 +22,13 @@ async function getOpenAIKey(): Promise<string> {
   }
 
   // Fallback: fetch from Supabase secrets table (if service role key exists)
-  if (process.env.SUPABASE_SERVICE_ROLE_KEY && process.env.NEXT_PUBLIC_SUPABASE_URL) {
+  // Check both possible env var names (with and without NEXT_PUBLIC_)
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY;
+  if (serviceRoleKey && process.env.NEXT_PUBLIC_SUPABASE_URL) {
     try {
       const supabase = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL,
-        process.env.SUPABASE_SERVICE_ROLE_KEY
+        serviceRoleKey
       );
 
       const { data, error } = await supabase

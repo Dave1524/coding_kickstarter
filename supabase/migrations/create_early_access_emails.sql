@@ -11,10 +11,19 @@ create table if not exists public.early_access_emails (
 
 alter table public.early_access_emails enable row level security;
 
+-- Allow anonymous users to insert
 create policy "anon can insert early access"
   on public.early_access_emails
   for insert
   to anon
+  with check (true);
+
+-- Allow anonymous users to update (for upsert operations)
+create policy "anon can update early access"
+  on public.early_access_emails
+  for update
+  to anon
+  using (true)
   with check (true);
 
 -- Create index on email for faster lookups

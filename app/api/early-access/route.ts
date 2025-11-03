@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 
 export const runtime = 'edge';
 
@@ -40,8 +40,35 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get Supabase client
-    const supabase = createClient();
+    // Get environment variables (Edge runtime compatible)
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY;
+    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!url) {
+      return NextResponse.json(
+        { error: 'Server configuration error: Missing NEXT_PUBLIC_SUPABASE_URL' },
+        { status: 500 }
+      );
+    }
+
+    // Use service role key if available, otherwise fall back to anon key
+    const key = serviceRoleKey || anonKey;
+    
+    if (!key) {
+      return NextResponse.json(
+        { error: 'Server configuration error: Missing Supabase API key' },
+        { status: 500 }
+      );
+    }
+
+    // Create Supabase client with service role key (bypasses RLS)
+    const supabase = createSupabaseClient(url, key, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+    });
 
     // Upsert email (insert or update if exists)
     const { data, error } = await supabase
