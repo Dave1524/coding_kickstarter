@@ -151,7 +151,7 @@ export default function EarlyAccessModal({ open, onClose, idea, source }: EarlyA
                     setError('');
                   }}
                   placeholder="your@email.com"
-                  className="w-full px-4 py-3 text-lg border-2 border-gray-300 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all font-sans"
+                  className="w-full px-4 py-3 text-lg text-gray-900 border-2 border-gray-300 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all font-sans"
                   disabled={loading}
                   required
                   autoFocus

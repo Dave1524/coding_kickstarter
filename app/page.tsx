@@ -146,7 +146,7 @@ export default function Home() {
                 }
               }}
               placeholder="e.g., Todo app for 100 users, chat app for teams, weather dashboard..."
-              className="w-full px-4 py-3 text-lg border-2 border-gray-300 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all resize-none font-sans"
+              className="w-full px-4 py-3 text-lg text-gray-900 border-2 border-gray-300 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all resize-none font-sans"
               rows={4}
               disabled={loading}
             />
@@ -327,9 +327,10 @@ export default function Home() {
                   setSaveError('');
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
-                className="text-purple-600 hover:text-purple-800 font-semibold underline transition-colors inline-flex items-center gap-1"
+                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl inline-flex items-center gap-2"
               >
-                ← Try another idea
+                <span>←</span>
+                <span>Try another idea</span>
               </button>
             </div>
           </div>
