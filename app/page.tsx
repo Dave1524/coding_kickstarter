@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import PDFDownload from '@/components/PDFDownload';
+import EarlyAccessModal from '@/components/EarlyAccessModal';
 
 interface GenerateResult {
   provider: string;
@@ -24,6 +25,7 @@ export default function Home() {
   const [isSaving, setIsSaving] = useState(false);
   const [savedId, setSavedId] = useState('');
   const [saveError, setSaveError] = useState('');
+  const [earlyOpen, setEarlyOpen] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -113,7 +115,7 @@ export default function Home() {
             Coding Kickstarter
           </h1>
           <p className="text-lg sm:text-xl text-gray-700 max-w-2xl mx-auto leading-relaxed">
-            Tell us your project idea and we'll generate a beginner-friendly setup guide powered by AI.
+            No setup paralysis, just code!
           </p>
           <div className="mt-4 flex items-center justify-center gap-2 text-sm text-gray-600">
             <span className="flex items-center gap-1">
@@ -134,29 +136,48 @@ export default function Home() {
               id="idea"
               value={idea}
               onChange={(e) => setIdea(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey && !loading && idea.trim()) {
+                  e.preventDefault();
+                  const form = e.currentTarget.closest('form');
+                  if (form) {
+                    form.requestSubmit();
+                  }
+                }
+              }}
               placeholder="e.g., Todo app for 100 users, chat app for teams, weather dashboard..."
               className="w-full px-4 py-3 text-lg border-2 border-gray-300 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all resize-none font-sans"
               rows={4}
               disabled={loading}
             />
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="mt-6 w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-4 px-6 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-lg shadow-lg hover:shadow-xl disabled:shadow-lg"
-            >
-              {loading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Generating your guide...
-                </span>
-              ) : (
-                'Generate Setup Guide'
-              )}
-            </button>
+            <div className="mt-6 flex flex-col sm:flex-row gap-3">
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-4 px-6 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-lg shadow-lg hover:shadow-xl disabled:shadow-lg"
+              >
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Generating your guide...
+                  </span>
+                ) : (
+                  'Generate Setup Guide'
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => setEarlyOpen(true)}
+                disabled={loading}
+                className="flex-1 px-6 py-4 border-2 border-purple-300 text-purple-700 bg-white rounded-xl hover:bg-purple-50 font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed text-lg shadow-lg hover:shadow-xl disabled:shadow-lg"
+              >
+                Sign up for early access
+              </button>
+            </div>
           </div>
         </form>
 
@@ -234,7 +255,7 @@ export default function Home() {
               <button
                 onClick={handleSave}
                 disabled={isSaving || !result}
-                className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-semibold rounded-xl hover:from-indigo-700 hover:to-blue-700 transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg hover:shadow-xl"
+                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg hover:shadow-xl flex items-center gap-2"
               >
                 {isSaving ? (
                   <span className="flex items-center gap-2">
@@ -245,8 +266,18 @@ export default function Home() {
                     Saving...
                   </span>
                 ) : (
-                  '💾 Save Sprint'
+                  <>
+                    <span>💾</span>
+                    <span>Save Sprint</span>
+                  </>
                 )}
+              </button>
+              <button
+                onClick={() => setEarlyOpen(true)}
+                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl flex items-center gap-2"
+              >
+                <span>🎉</span>
+                <span>Sign up for early access</span>
               </button>
             </div>
 
@@ -323,6 +354,14 @@ export default function Home() {
           </a>
         </p>
       </footer>
+
+      {/* Early Access Modal */}
+      <EarlyAccessModal
+        open={earlyOpen}
+        onClose={() => setEarlyOpen(false)}
+        idea={result?.idea ?? idea}
+        source={result ? 'results' : 'landing'}
+      />
     </div>
   );
 }

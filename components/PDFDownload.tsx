@@ -14,7 +14,6 @@ import {
   Rect,
 } from '@react-pdf/renderer';
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 
 // Helper to clean markdown of emoji for PDF compatibility
@@ -195,9 +194,13 @@ export default function PDFDownload({ data }: PDFDownloadProps) {
   };
 
   return (
-    <Button onClick={generatePDF} disabled={isGenerating} className="gap-2">
+    <button
+      onClick={generatePDF}
+      disabled={isGenerating}
+      className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg hover:shadow-xl flex items-center gap-2"
+    >
       <Download className="w-4 h-4" />
       {isGenerating ? 'Generating...' : 'Download PDF'}
-    </Button>
+    </button>
   );
 }
