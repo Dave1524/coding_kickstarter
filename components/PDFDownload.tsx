@@ -7,23 +7,59 @@ import {
   View,
   StyleSheet,
   pdf,
-  Svg,
-  Defs,
-  LinearGradient,
-  Stop,
-  Rect,
 } from '@react-pdf/renderer';
 import { useState } from 'react';
 import { Download } from 'lucide-react';
 
-// Helper to clean markdown of emoji for PDF compatibility
+// Helper to sanitize text for PDF - ensures UTF-8 encoding and removes problematic characters
+const sanitizeTextForPDF = (text: string): string => {
+  if (!text) return '';
+  
+  // Ensure text is properly encoded as UTF-8
+  let sanitized = text;
+  
+  // Remove or replace problematic Unicode characters that cause rendering issues
+  // Keep common punctuation and symbols, but remove control characters
+  sanitized = sanitized
+    // Remove zero-width characters
+    .replace(/[\u200B-\u200D\uFEFF]/g, '')
+    // Remove control characters except newlines and tabs
+    .replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, '')
+    // Normalize line breaks
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n');
+  
+  // Remove emoji (but preserve regular text)
+  sanitized = sanitized.replace(/[\u{1F300}-\u{1F9FF}]/gu, '');
+  
+  // Remove replacement characters
+  sanitized = sanitized.replace(/\uFFFD/g, '');
+  
+  // Only normalize actual markdown checkboxes
+  sanitized = sanitized
+    .replace(/\[ \]/g, '[ ]') // Normalize empty checkbox
+    .replace(/\[x\]/gi, '[x]'); // Normalize checked checkbox
+  
+  return sanitized.trim();
+};
+
+// Helper to clean markdown for PDF compatibility (preserve text, only remove problematic characters)
 const cleanMarkdownForPDF = (text: string) => {
-  return text
-    .replace(/[\u{1F300}-\u{1F9FF}]/gu, '') // Remove emoji
-    .replace(/\uFFFD/g, '') // Remove replacement characters
-    .replace(/[�~?�~`�o"�o"�o.]/g, '[ ]') // Replace checkboxes with [ ]
-    .replace(/[�o-�o~�?O]/g, '[x]') // Replace crosses with [x]
-    .trim();
+  return sanitizeTextForPDF(text);
+};
+
+// Helper to parse markdown table
+const parseMarkdownTable = (markdownTable: string): { headers: string[]; rows: string[][] } => {
+  const lines = markdownTable.trim().split('\n');
+  const headers = lines[0]?.split('|').map((h) => h.trim()).filter((h) => h) || [];
+  
+  // Skip separator line (usually second line with dashes)
+  const dataLines = lines.slice(2);
+  const rows = dataLines
+    .map((line) => line.split('|').map((cell) => cell.trim()).filter((cell) => cell))
+    .filter((row) => row.length > 0);
+  
+  return { headers, rows };
 };
 
 const styles = StyleSheet.create({
@@ -35,61 +71,153 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
   header: {
-    position: 'relative',
-    borderRadius: 12,
-    overflow: 'hidden',
-    marginBottom: 32,
-    height: 140,
-  },
-  headerBackground: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  headerContent: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    backgroundColor: '#2563EB',
     padding: 32,
-    display: 'flex',
-    justifyContent: 'center',
+    marginBottom: 32,
+    borderRadius: 8,
   },
-  title: { fontSize: 28, fontWeight: 'bold', color: 'white' },
-  tagline: { fontSize: 14, color: '#E9D8FD', marginTop: 8 },
-  section: { marginBottom: 24 },
-  sectionTitle: { fontSize: 16, fontWeight: 'bold', color: '#4C1D95', marginBottom: 8 },
-  text: { marginBottom: 6, lineHeight: 1.6 },
-  listItem: { marginLeft: 16, marginBottom: 6 },
-  listLabel: { fontWeight: 'bold', color: '#4338CA' },
-  code: {
-    backgroundColor: '#f3f4f6',
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: 'white',
+    marginBottom: 8,
+  },
+  tagline: {
+    fontSize: 14,
+    color: '#E0E7FF',
+  },
+  section: {
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#2563EB',
+    marginBottom: 12,
+    borderBottomWidth: 2,
+    borderBottomColor: '#2563EB',
+    paddingBottom: 4,
+  },
+  text: {
+    marginBottom: 8,
+    lineHeight: 1.6,
+  },
+  questionItem: {
+    marginBottom: 16,
+    paddingLeft: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: '#2563EB',
+    paddingBottom: 8,
+  },
+  questionLabel: {
+    fontWeight: 'bold',
+    color: '#2563EB',
+    marginBottom: 4,
+  },
+  answerText: {
+    color: '#4B5563',
+    marginTop: 4,
+  },
+  stepItem: {
+    marginBottom: 16,
+    padding: 12,
+    backgroundColor: '#F9FAFB',
+    borderRadius: 6,
+    borderLeftWidth: 4,
+    borderLeftColor: '#2563EB',
+  },
+  stepTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#1F2937',
+    marginBottom: 8,
+  },
+  codeBlock: {
+    backgroundColor: '#1F2937',
+    color: '#F9FAFB',
     padding: 12,
     borderRadius: 6,
     fontFamily: 'Courier',
-    fontSize: 11,
+    fontSize: 10,
     marginTop: 8,
-    color: '#111827',
+    marginBottom: 8,
+  },
+  tipText: {
+    marginTop: 8,
+    fontSize: 11,
+    color: '#6B7280',
   },
   epicBox: {
     border: '1pt solid #E5E7EB',
     borderRadius: 6,
     padding: 12,
-    marginBottom: 12,
+    marginBottom: 8,
     backgroundColor: '#F9FAFB',
   },
-  epicTitle: { fontSize: 14, fontWeight: 'bold', color: '#7C3AED' },
-  footer: { marginTop: 40, fontSize: 10, color: '#9CA3AF', textAlign: 'center' },
+  epicTitle: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: '#2563EB',
+    marginBottom: 6,
+  },
+  epicItem: {
+    fontSize: 11,
+    color: '#4B5563',
+    marginBottom: 4,
+  },
+  table: {
+    width: '100%',
+    marginTop: 12,
+    marginBottom: 12,
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  tableHeader: {
+    flexDirection: 'row',
+    backgroundColor: '#2563EB',
+    borderBottomWidth: 1,
+    borderBottomColor: '#1E40AF',
+  },
+  tableRow: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  tableCell: {
+    flex: 1,
+    padding: 10,
+    fontSize: 10,
+    color: '#1F2937',
+  },
+  tableCellHeader: {
+    flex: 1,
+    padding: 10,
+    fontSize: 11,
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  footer: {
+    marginTop: 40,
+    fontSize: 10,
+    color: '#9CA3AF',
+    textAlign: 'center',
+  },
 });
 
 interface SprintData {
   idea: string;
   questions: { q: string; a: string }[];
   steps: { step: string; command?: string; tip?: string }[];
-  blueprint: { epics: string[]; kanbanMarkdown: string };
+  blueprint: { 
+    epics: {
+      input?: string[];
+      output?: string[];
+      export?: string[];
+      history?: string[];
+    };
+    kanbanMarkdown: string;
+  };
 }
 
 interface PDFDownloadProps {
@@ -106,66 +234,149 @@ export default function PDFDownload({ data }: PDFDownloadProps) {
       const doc = (
         <Document>
           <Page size="A4" style={styles.page}>
+            {/* Header */}
             <View style={styles.header}>
-              <Svg style={styles.headerBackground}>
-                <Defs>
-                  <LinearGradient id="headerGradient" x1="0" y1="0" x2="1" y2="0">
-                    <Stop offset="0%" stopColor="#2563EB" />
-                    <Stop offset="50%" stopColor="#7C3AED" />
-                    <Stop offset="100%" stopColor="#DB2777" />
-                  </LinearGradient>
-                </Defs>
-                <Rect x="0" y="0" width="100%" height="140" fill="url(#headerGradient)" />
-              </Svg>
-              <View style={styles.headerContent}>
-                <Text style={styles.title}>Coding Kickstarter</Text>
-                <Text style={styles.tagline}>Your Day 1 Setup Plan</Text>
-              </View>
+              <Text style={styles.title}>Coding Kickstarter</Text>
+              <Text style={styles.tagline}>Your Day 1 Setup Plan</Text>
             </View>
 
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Your Idea</Text>
-              <Text style={styles.text}>{data.idea}</Text>
+              <Text style={styles.text}>{sanitizeTextForPDF(data.idea)}</Text>
             </View>
 
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Clarifying Questions</Text>
-              {data.questions.map((qa, i) => (
-                <View key={i} style={styles.listItem}>
-                  <Text>
-                    <Text style={styles.listLabel}>Q{i + 1}:</Text> {qa.q}
-                  </Text>
-                  <Text style={{ marginTop: 4 }}>
-                    <Text style={styles.listLabel}>Notes:</Text> {qa.a || 'Add your answer here.'}
-                  </Text>
-                </View>
-              ))}
-            </View>
+            {/* Questions & Answers */}
+            {data.questions && data.questions.length > 0 && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Clarifying Questions</Text>
+                {data.questions.map((qa, i) => (
+                  <View key={i} style={styles.questionItem}>
+                    <Text style={styles.questionLabel}>
+                      Q{i + 1}: {sanitizeTextForPDF(qa.q)}
+                    </Text>
+                    <Text style={styles.answerText}>
+                      A: {sanitizeTextForPDF(qa.a || 'Not answered')}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            )}
 
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Top 5 Setup Steps</Text>
-              {data.steps.map((step, i) => (
-                <View key={i} style={styles.listItem}>
-                  <Text style={{ fontWeight: 'bold' }}>
-                    Step {i + 1}: {step.step}
-                  </Text>
-                  {step.command && <Text style={styles.code}>{step.command}</Text>}
-                  {step.tip && <Text style={{ marginTop: 4, fontStyle: 'italic' }}>{step.tip}</Text>}
-                </View>
-              ))}
-            </View>
+            {/* Setup Steps */}
+            {data.steps && data.steps.length > 0 && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Top 5 Setup Steps</Text>
+                {data.steps.map((step, i) => (
+                  <View key={i} style={styles.stepItem}>
+                    <Text style={styles.stepTitle}>
+                      Step {i + 1}: {sanitizeTextForPDF(step.step)}
+                    </Text>
+                    {step.command && (
+                      <Text style={styles.codeBlock}>{sanitizeTextForPDF(step.command)}</Text>
+                    )}
+                    {step.tip && (
+                      <Text style={styles.tipText}>
+                        💡 {sanitizeTextForPDF(step.tip)}
+                      </Text>
+                    )}
+                  </View>
+                ))}
+              </View>
+            )}
 
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>MVP Blueprint</Text>
-              {data.blueprint.epics.map((epic, i) => (
-                <View key={i} style={styles.epicBox}>
-                  <Text style={styles.epicTitle}>Epic {i + 1}</Text>
-                  <Text style={{ marginTop: 4 }}>{epic}</Text>
-                </View>
-              ))}
-              <Text style={styles.sectionTitle}>Kanban Board (Markdown)</Text>
-              <Text style={styles.code}>{cleanMarkdownForPDF(data.blueprint.kanbanMarkdown)}</Text>
-            </View>
+            {/* MVP Blueprint */}
+            {data.blueprint && data.blueprint.epics && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>MVP Blueprint</Text>
+                
+                {/* Input Epics */}
+                {data.blueprint.epics.input && data.blueprint.epics.input.length > 0 && (
+                  <View style={styles.epicBox}>
+                    <Text style={styles.epicTitle}>Input Epics</Text>
+                    {data.blueprint.epics.input.map((epic, i) => (
+                      <Text key={i} style={styles.epicItem}>
+                        • {sanitizeTextForPDF(epic)}
+                      </Text>
+                    ))}
+                  </View>
+                )}
+                
+                {/* Output Epics */}
+                {data.blueprint.epics.output && data.blueprint.epics.output.length > 0 && (
+                  <View style={styles.epicBox}>
+                    <Text style={styles.epicTitle}>Output Epics</Text>
+                    {data.blueprint.epics.output.map((epic, i) => (
+                      <Text key={i} style={styles.epicItem}>
+                        • {sanitizeTextForPDF(epic)}
+                      </Text>
+                    ))}
+                  </View>
+                )}
+                
+                {/* Export Epics */}
+                {data.blueprint.epics.export && data.blueprint.epics.export.length > 0 && (
+                  <View style={styles.epicBox}>
+                    <Text style={styles.epicTitle}>Export Epics</Text>
+                    {data.blueprint.epics.export.map((epic, i) => (
+                      <Text key={i} style={styles.epicItem}>
+                        • {sanitizeTextForPDF(epic)}
+                      </Text>
+                    ))}
+                  </View>
+                )}
+                
+                {/* History Epics */}
+                {data.blueprint.epics.history && data.blueprint.epics.history.length > 0 && (
+                  <View style={styles.epicBox}>
+                    <Text style={styles.epicTitle}>History Epics</Text>
+                    {data.blueprint.epics.history.map((epic, i) => (
+                      <Text key={i} style={styles.epicItem}>
+                        • {sanitizeTextForPDF(epic)}
+                      </Text>
+                    ))}
+                  </View>
+                )}
+              </View>
+            )}
+
+            {/* Kanban Board */}
+            {(() => {
+              const { headers, rows } = parseMarkdownTable(data.blueprint.kanbanMarkdown);
+              if (headers.length > 0 && rows.length > 0) {
+                return (
+                  <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>Kanban Board</Text>
+                    <View style={styles.table}>
+                      {/* Header Row */}
+                      <View style={styles.tableHeader}>
+                        {headers.map((header, i) => (
+                          <Text key={i} style={styles.tableCellHeader}>
+                            {sanitizeTextForPDF(header)}
+                          </Text>
+                        ))}
+                      </View>
+                      {/* Data Rows */}
+                      {rows.map((row, i) => (
+                        <View key={i} style={styles.tableRow}>
+                          {row.map((cell, j) => {
+                            // Only clean if cell contains markdown checkboxes, otherwise use as-is
+                            const cleanedCell = cell.includes('[ ]') || cell.includes('[x]') 
+                              ? cleanMarkdownForPDF(cell) 
+                              : sanitizeTextForPDF(cell);
+                            return (
+                              <Text key={j} style={styles.tableCell}>
+                                {cleanedCell}
+                              </Text>
+                            );
+                          })}
+                        </View>
+                      ))}
+                    </View>
+                  </View>
+                );
+              }
+              return null;
+            })()}
 
             <Text style={styles.footer}>
               Generated by Coding Kickstarter - https://codingkickstarter.vercel.app

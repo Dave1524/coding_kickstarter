@@ -1,0 +1,5 @@
+Test prompts:
+
+A habit-tracking dashboard where users log daily streaks for custom habits (e.g., “Drink water”, “Read 30 mins”). Include social sharing via public profile links, email/password login, and a weekly email summary. Data must be private by default.
+
+A flashcard app where users can create decks, add cards with front/back text, and quiz themselves with a spaced-repetition algorithm. Include user accounts so progress syncs across devices.

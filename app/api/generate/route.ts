@@ -52,7 +52,10 @@ export async function POST(request: NextRequest) {
   try {
     // Parse request body
     const body = await request.json();
-    const { idea } = body;
+    const { idea, answers } = body as {
+      idea?: unknown;
+      answers?: unknown;
+    };
 
     if (!idea || typeof idea !== 'string') {
       return NextResponse.json(
@@ -61,40 +64,79 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Answers should be an object, default to empty if not provided
+    const answerMap: Record<string, string> = 
+      answers && typeof answers === 'object' && !Array.isArray(answers)
+        ? answers as Record<string, string>
+        : {};
+
     // Get OpenAI API key
     const apiKey = await getOpenAIKey();
     const openai = new OpenAI({ apiKey });
 
-    // Craft the prompt for structured output
-    const prompt = `You are a helpful coding mentor for complete beginners building "${idea}".
+    // Build prompt with answers injected
+    const prompt = `You are an expert setup coach.
+User idea: "${idea}"
+Answers: ${JSON.stringify(answerMap)}
 
-Generate a beginner-friendly setup guide with:
-1. 3-4 clarifying questions to ask the user (e.g., "Need user authentication?", "Expected scale?")
-2. Top 5 setup steps with actual terminal commands (e.g., "1. Create GitHub repo: git init")
-3. A Kanban board in markdown format with 3 columns: To Do, In Progress, Done
+Generate:
+1. Top 5 Setup Wins – numbered, each with:
+   - Title: WHAT the step accomplishes (e.g., "Initialize Your Project", "Set Up Database", "Configure Authentication")
+   - Cursor prompt: Copy-paste ready Cursor prompt for this step
+   - Terminal command: The exact command to run (if applicable)
+   - Supabase tip: Explanation of WHAT the command does and WHY it's needed (if Supabase relevant)
 
-IMPORTANT: Return ONLY valid JSON in this exact format (no extra text):
+IMPORTANT FOR STEP STRUCTURE:
+- Title should describe the STEP'S PURPOSE, not the command itself
+- Command should be the exact terminal command to run
+- Supabase tip should explain what the command does and why it's needed
+- Example: Title: "Initialize Your Project", Command: "npx create-next-app@latest", Tip: "Creates a new Next.js project with TypeScript and Tailwind CSS configured"
+
+2. Kanban Board – Markdown table: To Do | In Progress | Done
+   - Use clear, readable task names
+   - Avoid special characters that might cause encoding issues
+
+3. MVP Blueprint – Epics: Input, Output, Export, History
+   - Use clear, concise epic descriptions
+   - Avoid special characters
+
+4. PDF-Ready JSON – with gradient color, user's app name, timestamp
+
+Tone: Confident, beginner-friendly, zero fluff. Make user feel: "I can ship this TODAY."
+
+Return ONLY valid JSON in this exact format:
 {
-  "questions": ["Question 1?", "Question 2?", "Question 3?"],
-  "steps": [
-    "1. Step with command: \`npm install\`",
-    "2. Another step with details",
-    "3. Setup Supabase: Visit dashboard.supabase.com",
-    "4. Configure environment: Create .env.local file",
-    "5. Deploy to Vercel: \`vercel deploy\`"
+  "top5": [
+    {
+      "title": "Step purpose (what it accomplishes)",
+      "cursorPrompt": "Copy-paste ready Cursor prompt",
+      "command": "npx create-next-app@latest",
+      "supabaseTip": "Explanation of what the command does and why it's needed"
+    }
   ],
-  "kanbanMarkdown": "### 📋 To Do\\n- [ ] Setup GitHub repo\\n- [ ] Install dependencies\\n\\n### 🔄 In Progress\\n- [ ] Configure Supabase\\n\\n### ✅ Done\\n- [x] Read this guide"
-}
-
-Make it fun, beginner-friendly, and actionable. Include scalability tips (e.g., "Use Supabase RLS for 100+ users"). Use emojis to match the "vibe" style.`;
+  "kanbanMarkdown": "| To Do | In Progress | Done |\n|---|---|---|\n| Task 1 | Task 2 | Task 3 |",
+  "blueprint": {
+    "epics": {
+      "input": ["Epic 1", "Epic 2"],
+      "output": ["Epic 3"],
+      "export": ["Epic 4"],
+      "history": ["Epic 5"]
+    }
+  },
+  "pdfMeta": {
+    "appName": "Generated app name",
+    "gradient": ["#3b82f6", "#8b5cf6"],
+    "timestamp": "${new Date().toISOString()}"
+  }
+}`;
 
     // Call OpenAI API
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini', // Fast and affordable for planning
+      model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',
-          content: 'You are a coding mentor who helps beginners kickstart projects with clear, fun, actionable steps. Always return valid JSON.'
+          content: 'You are a Senior Setup Coach. Return ONLY JSON.'
         },
         {
           role: 'user',
@@ -102,7 +144,7 @@ Make it fun, beginner-friendly, and actionable. Include scalability tips (e.g., 
         }
       ],
       temperature: 0.7,
-      response_format: { type: 'json_object' } // Force JSON output
+      response_format: { type: 'json_object' }
     });
 
     // Parse the response
@@ -114,20 +156,30 @@ Make it fun, beginner-friendly, and actionable. Include scalability tips (e.g., 
     const parsed = JSON.parse(content);
 
     // Validate structure
-    if (!parsed.questions || !parsed.steps || !parsed.kanbanMarkdown) {
+    if (!parsed.top5 || !parsed.kanbanMarkdown || !parsed.blueprint || !parsed.pdfMeta) {
       throw new Error('Invalid response structure from OpenAI');
     }
 
-    // Return structured response
-    return NextResponse.json({
+    // Build response with backward compatibility
+    const out = {
       provider: 'openai',
       model: 'gpt-4o-mini',
       idea,
-      questions: parsed.questions,
-      steps: parsed.steps,
+      answers: answerMap,
+      output: {
+        top5: parsed.top5,
+        kanbanMarkdown: parsed.kanbanMarkdown,
+        blueprint: parsed.blueprint,
+        pdfMeta: parsed.pdfMeta,
+      },
+      // Back-compat for existing UI
+      steps: (parsed.top5 ?? []).map((t: any) => t.title || t),
       kanbanMarkdown: parsed.kanbanMarkdown,
-      timestamp: new Date().toISOString()
-    });
+      blueprint: parsed.blueprint,
+      timestamp: new Date().toISOString(),
+    };
+
+    return NextResponse.json(out);
 
   } catch (error) {
     console.error('Generate API Error:', error);
