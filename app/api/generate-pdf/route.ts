@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { pdf } from '@react-pdf/renderer';
+import { pdf, Document } from '@react-pdf/renderer';
 import React from 'react';
 import { PDFTemplate } from '@/components/PDFTemplate';
+import { Readable } from 'stream';
 
 /**
  * PDF Generation API
@@ -52,10 +53,19 @@ export async function POST(request: NextRequest) {
     console.log('Prepared PDF data, generating PDF...');
     
     // Generate PDF using React.createElement (API routes are .ts files, not .tsx)
-    const pdfBuffer = await pdf(
-      React.createElement(PDFTemplate, { data: pdfData })
-    ).toBuffer();
-
+    // Type assertion needed because TypeScript doesn't infer that PDFTemplate returns Document
+    const pdfElement = React.createElement(PDFTemplate, { data: pdfData }) as any;
+    const pdfStream = await pdf(pdfElement).toBuffer();
+    
+    // Convert ReadableStream to Buffer using Node.js stream utilities
+    const nodeStream = Readable.fromWeb(pdfStream as any);
+    const chunks: Buffer[] = [];
+    
+    for await (const chunk of nodeStream) {
+      chunks.push(Buffer.from(chunk));
+    }
+    
+    const pdfBuffer = Buffer.concat(chunks);
     console.log('PDF generated successfully, size:', pdfBuffer.length);
     
     // Return PDF blob

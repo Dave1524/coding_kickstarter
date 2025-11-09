@@ -29,14 +29,14 @@ export function validateAnswer(answer: string, questionId: string, questionText:
   // Check if answer is empty
   const emptyResult = AnswerSchema.safeParse(answer);
   if (!emptyResult.success) {
-    return { isValid: false, error: emptyResult.error.errors[0].message };
+    return { isValid: false, error: emptyResult.error.issues[0].message };
   }
 
   // Check for email format if question mentions email
   if (questionText.toLowerCase().includes('email') && answer.includes('@')) {
     const emailResult = EmailAnswerSchema.safeParse(answer);
     if (!emailResult.success) {
-      return { isValid: false, error: emailResult.error.errors[0].message };
+      return { isValid: false, error: emailResult.error.issues[0].message };
     }
   }
 
@@ -45,7 +45,7 @@ export function validateAnswer(answer: string, questionId: string, questionText:
   if (urlKeywords.some(keyword => questionText.toLowerCase().includes(keyword)) && (answer.startsWith('http') || answer.includes('.'))) {
     const urlResult = UrlAnswerSchema.safeParse(answer);
     if (!urlResult.success) {
-      return { isValid: false, error: urlResult.error.errors[0].message };
+      return { isValid: false, error: urlResult.error.issues[0].message };
     }
   }
 
@@ -56,7 +56,7 @@ export function validateAnswer(answer: string, questionId: string, questionText:
 export function validateIdea(idea: string): { isValid: boolean; error?: string } {
   const result = IdeaSchema.safeParse(idea);
   if (!result.success) {
-    return { isValid: false, error: result.error.errors[0].message };
+    return { isValid: false, error: result.error.issues[0].message };
   }
   return { isValid: true };
 }

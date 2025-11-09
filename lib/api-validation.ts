@@ -27,7 +27,7 @@ export const GenerateResponseSchema = z.object({
   provider: z.string().optional(),
   model: z.string().optional(),
   idea: z.string(),
-  answers: z.record(z.string()).optional(),
+  answers: z.record(z.string(), z.string()).optional(),
   output: z.object({
     top5: z.array(z.object({
       title: z.string(),
@@ -75,7 +75,7 @@ export function validateGenerateQuestionsResponse(data: unknown): z.infer<typeof
     return GenerateQuestionsResponseSchema.parse(data);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      throw new Error(`Invalid response structure: ${error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')}`);
+      throw new Error(`Invalid response structure: ${error.issues.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')}`);
     }
     throw error;
   }
@@ -89,7 +89,7 @@ export function validateCheckReadinessResponse(data: unknown): z.infer<typeof Ch
     return CheckReadinessResponseSchema.parse(data);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      throw new Error(`Invalid response structure: ${error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')}`);
+      throw new Error(`Invalid response structure: ${error.issues.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')}`);
     }
     throw error;
   }
@@ -126,7 +126,7 @@ export function validateGenerateResponse(data: unknown): z.infer<typeof Generate
   } catch (error) {
     if (error instanceof z.ZodError) {
       // For generate response, be more lenient - log but don't fail completely
-      console.warn('Response validation warnings:', error.errors);
+      console.warn('Response validation warnings:', error.issues);
       // Return the data anyway, but log the issues
       return data as z.infer<typeof GenerateResponseSchema>;
     }

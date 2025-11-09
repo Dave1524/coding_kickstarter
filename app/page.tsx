@@ -633,7 +633,7 @@ export default function Home() {
                 </label>
                 {questionSet[questionIndex].type === 'select' && questionSet[questionIndex].options ? (
                   <select
-                    ref={(el) => (inputRef.current = el)}
+                    ref={(el) => { inputRef.current = el; }}
                     id={`question-${questionSet[questionIndex].id}`}
                     className="w-full px-4 py-3 text-lg text-gray-900 border-2 border-gray-300 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all font-sans"
                     value={currentAnswer}
@@ -669,7 +669,7 @@ export default function Home() {
                   </select>
                 ) : (
                   <input
-                    ref={(el) => (inputRef.current = el)}
+                    ref={(el) => { inputRef.current = el; }}
                     id={`question-${questionSet[questionIndex].id}`}
                     type="text"
                     className="w-full px-4 py-3 text-lg text-gray-900 border-2 border-gray-300 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all font-sans"
