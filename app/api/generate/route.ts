@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
-import { createClient } from '@supabase/supabase-js';
+import { assertOpenAIKey } from '@/utils/env';
 
 /**
  * AI-Powered Setup Guide Generator
@@ -11,45 +11,48 @@ import { createClient } from '@supabase/supabase-js';
  * - Kanban board markdown
  * 
  * POST /api/generate
- * Body: { idea: string }
+ * Body: { idea: string, answers?: Record<string, string> }
  */
 
-// Helper: Get OpenAI API key from env or Supabase
-async function getOpenAIKey(): Promise<string> {
-  // Try env variable first (fastest)
-  if (process.env.OPENAI_API_KEY) {
-    return process.env.OPENAI_API_KEY;
+// Initialize rate limiter (5 requests per 60 seconds per IP)
+// Rate limiting is optional - only enabled if Upstash Redis is configured
+let ratelimit: any = null;
+try {
+  // Dynamic import to avoid build errors if packages aren't installed
+  if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+    const { Ratelimit } = require('@upstash/ratelimit');
+    const { Redis } = require('@upstash/redis');
+    const redis = Redis.fromEnv();
+    ratelimit = new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(5, '60 s'),
+    });
   }
-
-  // Fallback: fetch from Supabase secrets table (if service role key exists)
-  // Check both possible env var names (with and without NEXT_PUBLIC_)
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY;
-  if (serviceRoleKey && process.env.NEXT_PUBLIC_SUPABASE_URL) {
-    try {
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL,
-        serviceRoleKey
-      );
-
-      const { data, error } = await supabase
-        .from('secrets')
-        .select('api_key')
-        .eq('provider', 'openai')
-        .single();
-
-      if (!error && data?.api_key) {
-        return data.api_key;
-      }
-    } catch (err) {
-      console.warn('Failed to fetch OpenAI key from Supabase:', err);
-    }
-  }
-
-  throw new Error('OPENAI_API_KEY not found in environment or Supabase');
+} catch (error) {
+  console.warn('Rate limiting disabled: UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN not configured');
 }
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting (if configured)
+    if (ratelimit) {
+      // Get client IP from headers (respects X-Forwarded-For for Vercel)
+      const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+                 request.headers.get('x-real-ip') ||
+                 'anonymous';
+      
+      const { success } = await ratelimit.limit(ip);
+      if (!success) {
+        return NextResponse.json(
+          { error: 'Rate limit exceeded. Please wait before making another request.' },
+          { status: 429 }
+        );
+      }
+    }
+
+    // Validate environment variables (server-only)
+    const apiKey = assertOpenAIKey();
+
     // Parse request body
     const body = await request.json();
     const { idea, answers } = body as {
@@ -57,9 +60,18 @@ export async function POST(request: NextRequest) {
       answers?: unknown;
     };
 
+    // Validate input: idea length between 6 and 499 characters
     if (!idea || typeof idea !== 'string') {
       return NextResponse.json(
         { error: 'Missing or invalid "idea" field' },
+        { status: 400 }
+      );
+    }
+
+    const trimmedIdea = idea.trim();
+    if (trimmedIdea.length < 6 || trimmedIdea.length > 499) {
+      return NextResponse.json(
+        { error: 'Idea must be between 6 and 499 characters' },
         { status: 400 }
       );
     }
@@ -70,14 +82,24 @@ export async function POST(request: NextRequest) {
         ? answers as Record<string, string>
         : {};
 
-    // Get OpenAI API key
-    const apiKey = await getOpenAIKey();
+    // Sanitize answers
+    const sanitizedAnswers: Record<string, string> = {};
+    for (const [key, value] of Object.entries(answerMap)) {
+      if (typeof value === 'string') {
+        // Remove markdown code fences and script tags
+        sanitizedAnswers[key] = value
+          .replace(/```[\s\S]*?```/g, '')
+          .replace(/<script[\s\S]*?<\/script>/gi, '')
+          .trim();
+      }
+    }
+
     const openai = new OpenAI({ apiKey });
 
-    // Build prompt with answers injected
+    // Build prompt with sanitized answers
     const prompt = `You are an expert setup coach.
-User idea: "${idea}"
-Answers: ${JSON.stringify(answerMap)}
+User idea: "${trimmedIdea}"
+Answers: ${JSON.stringify(sanitizedAnswers)}
 
 Generate:
 1. Top 5 Setup Wins – numbered, each with:
@@ -160,12 +182,35 @@ Return ONLY valid JSON in this exact format:
       throw new Error('Invalid response structure from OpenAI');
     }
 
+    // Sanitize OpenAI output: strip markdown code fences and script tags
+    const sanitizeOutput = (text: string): string => {
+      return text
+        .replace(/```[\s\S]*?```/g, '')
+        .replace(/<script[\s\S]*?<\/script>/gi, '')
+        .replace(/javascript:/gi, '')
+        .trim();
+    };
+
+    // Sanitize all string fields in the response
+    if (parsed.kanbanMarkdown && typeof parsed.kanbanMarkdown === 'string') {
+      parsed.kanbanMarkdown = sanitizeOutput(parsed.kanbanMarkdown);
+    }
+    if (Array.isArray(parsed.top5)) {
+      parsed.top5 = parsed.top5.map((step: any) => ({
+        ...step,
+        title: typeof step.title === 'string' ? sanitizeOutput(step.title) : step.title,
+        cursorPrompt: typeof step.cursorPrompt === 'string' ? sanitizeOutput(step.cursorPrompt) : step.cursorPrompt,
+        command: typeof step.command === 'string' ? sanitizeOutput(step.command) : step.command,
+        supabaseTip: typeof step.supabaseTip === 'string' ? sanitizeOutput(step.supabaseTip) : step.supabaseTip,
+      }));
+    }
+
     // Build response with backward compatibility
     const out = {
       provider: 'openai',
       model: 'gpt-4o-mini',
-      idea,
-      answers: answerMap,
+      idea: trimmedIdea,
+      answers: sanitizedAnswers,
       output: {
         top5: parsed.top5,
         kanbanMarkdown: parsed.kanbanMarkdown,
@@ -189,7 +234,7 @@ Return ONLY valid JSON in this exact format:
       return NextResponse.json(
         {
           error: 'OpenAI API key not configured',
-          hint: 'Add OPENAI_API_KEY to your .env.local file and restart the server'
+          hint: 'Add OPENAI_API_KEY to your server environment variables (.env.local for local dev)'
         },
         { status: 500 }
       );

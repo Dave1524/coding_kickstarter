@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
-import { createClient } from '@supabase/supabase-js';
+import { assertOpenAIKey } from '@/utils/env';
 
 /**
  * AI-Powered Question Generator
@@ -11,41 +11,11 @@ import { createClient } from '@supabase/supabase-js';
  * Body: { idea: string }
  */
 
-// Helper: Get OpenAI API key from env or Supabase
-async function getOpenAIKey(): Promise<string> {
-  // Try env variable first (fastest)
-  if (process.env.OPENAI_API_KEY) {
-    return process.env.OPENAI_API_KEY;
-  }
-
-  // Fallback: fetch from Supabase secrets table (if service role key exists)
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY;
-  if (serviceRoleKey && process.env.NEXT_PUBLIC_SUPABASE_URL) {
-    try {
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL,
-        serviceRoleKey
-      );
-
-      const { data, error } = await supabase
-        .from('secrets')
-        .select('api_key')
-        .eq('provider', 'openai')
-        .single();
-
-      if (!error && data?.api_key) {
-        return data.api_key;
-      }
-    } catch (err) {
-      console.warn('Failed to fetch OpenAI key from Supabase:', err);
-    }
-  }
-
-  throw new Error('OPENAI_API_KEY not found in environment or Supabase');
-}
-
 export async function POST(request: NextRequest) {
   try {
+    // Validate environment variables (server-only)
+    const apiKey = assertOpenAIKey();
+
     // Parse request body
     const body = await request.json();
     const { idea } = body as { idea?: unknown };
@@ -57,14 +27,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get OpenAI API key
-    const apiKey = await getOpenAIKey();
+    // Validate input length
+    const trimmedIdea = idea.trim();
+    if (trimmedIdea.length < 6 || trimmedIdea.length > 499) {
+      return NextResponse.json(
+        { error: 'Idea must be between 6 and 499 characters' },
+        { status: 400 }
+      );
+    }
+
     const openai = new OpenAI({ apiKey });
 
     // Build prompt for question generation
     const prompt = `You are an expert setup coach helping beginners build their first app.
 
-User's project idea: "${idea.trim()}"
+User's project idea: "${trimmedIdea}"
 
 Generate 3-5 clarifying questions that will help you create a detailed setup guide. Focus on:
 - User's technical level and experience
@@ -152,7 +129,7 @@ Rules:
       return NextResponse.json(
         {
           error: 'OpenAI API key not configured',
-          hint: 'Add OPENAI_API_KEY to your .env.local file and restart the server'
+          hint: 'Add OPENAI_API_KEY to your server environment variables (.env.local for local dev)'
         },
         { status: 500 }
       );

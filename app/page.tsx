@@ -10,6 +10,7 @@ import AIExpansionAlert from '@/components/AIExpansionAlert';
 import SkipBanner from '@/components/SkipBanner';
 import SkipWarning from '@/components/SkipWarning';
 import DraftBanner from '@/components/DraftBanner';
+import TaskList from '@/components/TaskList';
 import { validateAnswer, validateIdea } from '@/lib/validation';
 import { useAutoSave, loadDraft, clearDraft } from '@/hooks/useAutoSave';
 import { validateGenerateQuestionsResponse, validateCheckReadinessResponse, validateGenerateResponse } from '@/lib/api-validation';
@@ -87,6 +88,20 @@ export default function Home() {
 
   // Auto-save draft
   useAutoSave(idea, answers, questionTexts, questionSet, questionIndex, skippedQuestions);
+
+  // Check if all questions are processed (answered or skipped) and trigger readiness check
+  useEffect(() => {
+    if (questionSet.length > 0 && !loadingQuestions && !loading && !readyToGenerate) {
+      const totalProcessed = Object.keys(answers).length + skippedQuestions.size;
+      const allProcessed = totalProcessed >= questionSet.length;
+      
+      // If all questions processed, trigger readiness check
+      if (allProcessed) {
+        checkReadiness(answers);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [answers, skippedQuestions, questionSet.length, loadingQuestions, loading, readyToGenerate]);
 
   // Load draft on mount - show banner instead of confirm dialog
   useEffect(() => {
@@ -294,11 +309,16 @@ export default function Home() {
     // Track analytics
     analytics.questionSkipped(questionIndex);
 
-    // Auto-advance to next question or check readiness
-    if (questionIndex === questionSet.length - 1) {
-      // Last question skipped, check readiness
+    // Check if we've gone through all questions (answered + skipped = total)
+    const totalProcessed = Object.keys(answers).length + newSkipped.size;
+    const isLastQuestion = questionIndex === questionSet.length - 1;
+    
+    // If we've processed all questions OR we're on the last question, check readiness
+    if (isLastQuestion || totalProcessed >= questionSet.length) {
+      // All questions processed (either answered or skipped), check readiness
       checkReadiness(answers);
     } else {
+      // Move to next question
       setQuestionIndex(questionIndex + 1);
       // Auto-focus next input
       setTimeout(() => {
@@ -506,7 +526,6 @@ export default function Home() {
               ...(result.output.blueprint.epics.export || []),
               ...(result.output.blueprint.epics.history || []),
             ],
-            kanbanMarkdown: result.output.kanbanMarkdown,
           },
         }),
       });
@@ -928,51 +947,42 @@ export default function Home() {
         {/* Results */}
         {result && (
           <div className="space-y-8 animate-fade-in">
-            {/* Setup Steps */}
-            <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 sm:p-8 border border-purple-200/50 hover:shadow-2xl transition-all duration-300 animate-slide-in">
-              <h2 className="text-2xl sm:text-3xl font-bold text-purple-600 mb-6 flex items-center gap-2">
-                <span>⚡</span>
-                <span>Top 5 Setup Steps</span>
-              </h2>
-              <ol className="space-y-5">
-                {result.output.top5.map((step, i) => (
-                  <li key={i} className="flex items-start gap-4 p-4 rounded-xl hover:bg-purple-50/50 transition-all group">
-                    <span className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 text-white rounded-full flex items-center justify-center font-bold shadow-md group-hover:scale-110 transition-transform">
-                      {i + 1}
-                    </span>
-                    <div className="flex-1 text-gray-800 leading-relaxed pt-1.5">
-                      <div className="font-semibold mb-1">{step.title}</div>
-                      {step.cursorPrompt && (
-                        <div className="text-sm text-gray-600 mt-2 bg-gray-50 p-2 rounded border border-gray-200">
-                          <span className="font-semibold">Cursor:</span> {step.cursorPrompt}
-                        </div>
-                      )}
-                      {step.command && (
-                        <div className="text-sm text-gray-600 mt-2 font-mono bg-gray-900 text-green-400 p-2 rounded">
-                          {step.command}
-                        </div>
-                      )}
-                      {step.supabaseTip && (
-                        <div className="text-sm text-blue-600 mt-2 bg-blue-50 p-2 rounded border border-blue-200">
-                          <span className="font-semibold">💡 Supabase:</span> {step.supabaseTip}
-                        </div>
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            </div>
+            {/* Task List */}
+            <TaskList
+              tasks={result.output.top5.map((step, i) => {
+                // Assign priority based on position
+                let priority: 'High' | 'Medium' | 'Low';
+                if (i < 2) {
+                  priority = 'High';
+                } else if (i < 4) {
+                  priority = 'Medium';
+                } else {
+                  priority = 'Low';
+                }
 
-            {/* Kanban Board */}
-            <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 sm:p-8 border border-pink-200/50 hover:shadow-2xl transition-all duration-300 animate-slide-in">
-              <h2 className="text-2xl sm:text-3xl font-bold text-pink-600 mb-6 flex items-center gap-2">
-                <span>📋</span>
-                <span>Your Project Kanban</span>
-              </h2>
-              <pre className="whitespace-pre-wrap font-mono text-sm text-gray-800 bg-gray-50 p-5 rounded-xl border border-gray-200 overflow-x-auto shadow-inner">
-                {result.output.kanbanMarkdown}
-              </pre>
-            </div>
+                // Build explanation: prefer supabaseTip (explains what/why), fallback to cursorPrompt
+                let explanation = '';
+                if (step.supabaseTip) {
+                  explanation = step.supabaseTip;
+                } else if (step.cursorPrompt) {
+                  explanation = step.cursorPrompt;
+                } else {
+                  // Generate a generic description from the title
+                  explanation = `Complete this step to move your project forward`;
+                }
+
+                // Get commands if available
+                const commands = step.command ? [step.command] : undefined;
+
+                return {
+                  number: i + 1,
+                  priority,
+                  title: step.title,
+                  explanation,
+                  commands,
+                };
+              })}
+            />
 
             {/* MVP Blueprint */}
             {result.output.blueprint && (
@@ -1027,57 +1037,86 @@ export default function Home() {
             )}
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
-              <PDFDownload
-                data={{
-                  idea: result.idea,
-                  questions: Object.entries(result.answers).map(([key, value]) => {
-                    // Try to get stored question text from result, then current state, then fallback to key
-                    const savedQuestionTexts = (result as any).questionTexts || {};
-                    const questionText = savedQuestionTexts[key] || questionTexts[key] || key;
-                    return {
-                      q: questionText,
-                      a: value,
-                    };
-                  }),
-                  steps: result.output.top5.map((s) => ({
-                    step: s.title,
-                    command: s.command,
-                    tip: s.supabaseTip,
-                  })),
-                  blueprint: {
-                    epics: result.output.blueprint.epics,
-                    kanbanMarkdown: result.output.kanbanMarkdown,
-                  },
-                }}
-              />
-              <button
-                onClick={handleSave}
-                disabled={isSaving || !result}
-                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg hover:shadow-xl flex items-center gap-2"
-              >
-                {isSaving ? (
-                  <span className="flex items-center gap-2">
-                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Saving...
-                  </span>
-                ) : (
-                  <>
-                    <span>💾</span>
-                    <span>Save Sprint</span>
-                  </>
-                )}
-              </button>
-              <button
-                onClick={() => setEarlyOpen(true)}
-                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl flex items-center gap-2"
-              >
-                <span>🎉</span>
-                <span>Sign up for early access</span>
-              </button>
+            <div className="space-y-4 pt-4">
+              {/* Row 1: PDF Download and Save Sprint */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <PDFDownload
+                  data={{
+                    idea: result.idea,
+                    questions: Object.entries(result.answers).map(([key, value]) => {
+                      // Try to get stored question text from result, then current state, then fallback to key
+                      const savedQuestionTexts = (result as any).questionTexts || {};
+                      const questionText = savedQuestionTexts[key] || questionTexts[key] || key;
+                      return {
+                        q: questionText,
+                        a: value,
+                      };
+                    }),
+                    steps: result.output.top5.map((s, i) => {
+                      // Assign priority based on position
+                      let priority: 'High' | 'Medium' | 'Low';
+                      if (i < 2) {
+                        priority = 'High';
+                      } else if (i < 4) {
+                        priority = 'Medium';
+                      } else {
+                        priority = 'Low';
+                      }
+
+                      // Build explanation: prefer supabaseTip (explains what/why), fallback to cursorPrompt
+                      let explanation = '';
+                      if (s.supabaseTip) {
+                        explanation = s.supabaseTip;
+                      } else if (s.cursorPrompt) {
+                        explanation = s.cursorPrompt;
+                      } else {
+                        explanation = `Complete this step to move your project forward`;
+                      }
+
+                      return {
+                        step: s.title,
+                        priority,
+                        explanation,
+                        command: s.command,
+                      };
+                    }),
+                    blueprint: {
+                      epics: result.output.blueprint.epics,
+                    },
+                  }}
+                />
+                <button
+                  onClick={handleSave}
+                  disabled={isSaving || !result}
+                  className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg hover:shadow-xl flex items-center gap-2"
+                >
+                  {isSaving ? (
+                    <span className="flex items-center gap-2">
+                      <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Saving...
+                    </span>
+                  ) : (
+                    <>
+                      <span>💾</span>
+                      <span>Save Sprint</span>
+                    </>
+                  )}
+                </button>
+              </div>
+              
+              {/* Row 2: Early Access Sign Up */}
+              <div className="flex justify-center">
+                <button
+                  onClick={() => setEarlyOpen(true)}
+                  className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                >
+                  <span>🎉</span>
+                  <span>Sign up for early access</span>
+                </button>
+              </div>
             </div>
 
             {/* Save Success Message */}
@@ -1107,14 +1146,6 @@ export default function Home() {
               </div>
             )}
 
-            {/* Metadata */}
-            <div className="text-center text-sm text-gray-500 pt-4 border-t border-gray-200">
-              <p className="flex items-center justify-center gap-2 flex-wrap">
-                <span>Generated with {result.model}</span>
-                <span>·</span>
-                <span>{new Date(result.timestamp).toLocaleString()}</span>
-              </p>
-            </div>
 
             {/* Try Again */}
             <div className="text-center pt-4">
@@ -1143,21 +1174,9 @@ export default function Home() {
       </div>
 
       {/* Footer - Always Visible */}
-      <footer className="text-center text-gray-600 py-6 px-4 mt-auto border-t border-gray-200/50 bg-white/50 backdrop-blur-sm">
+      <footer className="text-center text-gray-500 py-6 px-4 mt-auto border-t border-gray-200/50 bg-white/50 backdrop-blur-sm">
         <p className="text-sm">
-          Built with{' '}
-          <span className="font-semibold text-gray-700">Next.js</span>,{' '}
-          <span className="font-semibold text-gray-700">Supabase</span>, and{' '}
-          <span className="font-semibold text-gray-700">OpenAI</span>
-          {' · '}
-          <a 
-            href="https://github.com/Dave1524/coding_kickstarter" 
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-purple-600 hover:text-purple-700 underline font-medium transition-colors"
-          >
-            View on GitHub
-          </a>
+          © Coding Kickstarter 2025
         </p>
       </footer>
 

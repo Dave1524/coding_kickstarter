@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
+import { createServiceRoleClient } from '@/utils/supabase/server';
 
 export const runtime = 'edge';
 
@@ -42,6 +42,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate idea length
+    const trimmedIdea = idea.trim();
+    if (trimmedIdea.length < 6 || trimmedIdea.length > 499) {
+      return NextResponse.json(
+        { success: false, error: 'Idea must be between 6 and 499 characters' },
+        { status: 400 }
+      );
+    }
+
     if (!Array.isArray(questions) || questions.some((q) => typeof q !== 'string')) {
       return NextResponse.json(
         { success: false, error: 'Invalid or missing questions field' },
@@ -71,25 +80,52 @@ export async function POST(request: NextRequest) {
       };
     })();
 
-    // Get Supabase client
-    const supabase = createClient();
+    // Get Supabase client with service role key (bypasses RLS)
+    const supabase = createServiceRoleClient();
 
     // Insert into generated_sprints table
+    // Note: user_id is set to null for anonymous users (no auth required)
     const { data, error } = await supabase
       .from('generated_sprints')
       .insert({
-        idea: idea.trim(),
+        idea: trimmedIdea,
         questions,
         top_steps,
         blueprint: normalizedBlueprint,
+        user_id: null, // Anonymous - no user auth required
       })
       .select('id')
       .single();
 
     if (error) {
       console.error('Supabase insert error:', error);
+      
+      // Provide helpful error message for foreign key violations
+      if (error.code === '23503') {
+        return NextResponse.json(
+          { 
+            success: false,
+            error: 'Database constraint violation. The user_id column has a foreign key constraint.',
+            hint: 'Run this SQL in Supabase SQL Editor to fix: ALTER TABLE generated_sprints ALTER COLUMN user_id DROP NOT NULL; ALTER TABLE generated_sprints DROP CONSTRAINT IF EXISTS generated_sprints_user_id_fkey;'
+          },
+          { status: 500 }
+        );
+      }
+      
+      // Provide helpful error message for RLS policy violations
+      if (error.code === '42501') {
+        return NextResponse.json(
+          { 
+            success: false,
+            error: 'Database permission denied. SUPABASE_SERVICE_ROLE_KEY is required for write operations.',
+            hint: 'Get your service role key from: Supabase Dashboard → Settings → API → service_role key. Add it to .env.local as SUPABASE_SERVICE_ROLE_KEY=your-key-here'
+          },
+          { status: 500 }
+        );
+      }
+      
       return NextResponse.json(
-        { success: false, error: 'Failed to save sprint to database' },
+        { success: false, error: 'Failed to save sprint to database', details: error.message },
         { status: 500 }
       );
     }
@@ -101,7 +137,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Return success with the inserted ID
+    // Return success with ONLY the sprint ID (never keys or sensitive data)
     return NextResponse.json({
       success: true,
       id: data.id,
@@ -109,6 +145,28 @@ export async function POST(request: NextRequest) {
 
   } catch (err) {
     console.error('Save sprint error:', err);
+
+    // Provide helpful error message if service role key is missing
+    if (err instanceof Error && err.message.includes('SUPABASE_SERVICE_ROLE_KEY')) {
+      // Debug: Show what env vars are available (dev only)
+      const debugInfo = process.env.NODE_ENV === 'development' ? {
+        hasSupabaseUrl: !!(process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL),
+        hasServiceRoleKey: !!(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY),
+        hasAnonKey: !!(process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
+        envKeys: Object.keys(process.env).filter(k => k.includes('SUPABASE')),
+      } : undefined;
+
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Server configuration error',
+          details: err.message,
+          hint: 'Add SUPABASE_SERVICE_ROLE_KEY to your .env.local file and restart the dev server. Get it from Supabase Dashboard → Settings → API → service_role key',
+          debug: debugInfo,
+        },
+        { status: 500 }
+      );
+    }
 
     const message = err instanceof Error ? err.message : 'Unknown error';
     return NextResponse.json(

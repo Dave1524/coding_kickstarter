@@ -43,23 +43,16 @@ const sanitizeTextForPDF = (text: string): string => {
   return sanitized.trim();
 };
 
-// Helper to clean markdown for PDF compatibility (preserve text, only remove problematic characters)
-const cleanMarkdownForPDF = (text: string) => {
-  return sanitizeTextForPDF(text);
-};
-
-// Helper to parse markdown table
-const parseMarkdownTable = (markdownTable: string): { headers: string[]; rows: string[][] } => {
-  const lines = markdownTable.trim().split('\n');
-  const headers = lines[0]?.split('|').map((h) => h.trim()).filter((h) => h) || [];
-  
-  // Skip separator line (usually second line with dashes)
-  const dataLines = lines.slice(2);
-  const rows = dataLines
-    .map((line) => line.split('|').map((cell) => cell.trim()).filter((cell) => cell))
-    .filter((row) => row.length > 0);
-  
-  return { headers, rows };
+// Helper to get priority badge color for PDF
+const getPriorityColor = (priority: 'High' | 'Medium' | 'Low') => {
+  switch (priority) {
+    case 'High':
+      return '#DC2626'; // red-600
+    case 'Medium':
+      return '#D97706'; // amber-600
+    case 'Low':
+      return '#059669'; // emerald-600
+  }
 };
 
 const styles = StyleSheet.create({
@@ -123,29 +116,66 @@ const styles = StyleSheet.create({
     padding: 12,
     backgroundColor: '#F9FAFB',
     borderRadius: 6,
-    borderLeftWidth: 4,
-    borderLeftColor: '#2563EB',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    minHeight: 60, // Ensure minimum height to prevent awkward breaks
+  },
+  stepHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    gap: 8,
+  },
+  stepCheckbox: {
+    width: 12,
+    height: 12,
+    borderWidth: 2,
+    borderColor: '#6B7280',
+    borderRadius: 2,
+  },
+  stepNumber: {
+    width: 24,
+    height: 24,
+    backgroundColor: '#7C3AED',
+    borderRadius: 12,
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    paddingTop: 5,
   },
   stepTitle: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: 'bold',
     color: '#1F2937',
+    flex: 1,
+  },
+  priorityBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 10,
+    fontSize: 9,
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  stepExplanation: {
+    fontSize: 11,
+    color: '#4B5563',
     marginBottom: 8,
+    marginLeft: 44,
+    lineHeight: 1.5,
+    textAlign: 'left',
   },
   codeBlock: {
     backgroundColor: '#1F2937',
-    color: '#F9FAFB',
-    padding: 12,
+    color: '#10B981',
+    padding: 10,
     borderRadius: 6,
     fontFamily: 'Courier',
-    fontSize: 10,
-    marginTop: 8,
-    marginBottom: 8,
-  },
-  tipText: {
-    marginTop: 8,
-    fontSize: 11,
-    color: '#6B7280',
+    fontSize: 9,
+    marginTop: 6,
+    marginLeft: 44,
+    minHeight: 30, // Prevent code blocks from being cut in half
   },
   epicBox: {
     border: '1pt solid #E5E7EB',
@@ -153,6 +183,7 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 8,
     backgroundColor: '#F9FAFB',
+    minHeight: 40, // Prevent epic boxes from being cut
   },
   epicTitle: {
     fontSize: 13,
@@ -165,38 +196,6 @@ const styles = StyleSheet.create({
     color: '#4B5563',
     marginBottom: 4,
   },
-  table: {
-    width: '100%',
-    marginTop: 12,
-    marginBottom: 12,
-    borderStyle: 'solid',
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-  tableHeader: {
-    flexDirection: 'row',
-    backgroundColor: '#2563EB',
-    borderBottomWidth: 1,
-    borderBottomColor: '#1E40AF',
-  },
-  tableRow: {
-    flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  tableCell: {
-    flex: 1,
-    padding: 10,
-    fontSize: 10,
-    color: '#1F2937',
-  },
-  tableCellHeader: {
-    flex: 1,
-    padding: 10,
-    fontSize: 11,
-    fontWeight: 'bold',
-    color: 'white',
-  },
   footer: {
     marginTop: 40,
     fontSize: 10,
@@ -208,7 +207,12 @@ const styles = StyleSheet.create({
 interface SprintData {
   idea: string;
   questions: { q: string; a: string }[];
-  steps: { step: string; command?: string; tip?: string }[];
+  steps: { 
+    step: string; 
+    priority: 'High' | 'Medium' | 'Low';
+    explanation: string;
+    command?: string;
+  }[];
   blueprint: { 
     epics: {
       input?: string[];
@@ -216,7 +220,6 @@ interface SprintData {
       export?: string[];
       history?: string[];
     };
-    kanbanMarkdown: string;
   };
 }
 
@@ -233,28 +236,28 @@ export default function PDFDownload({ data }: PDFDownloadProps) {
 
       const doc = (
         <Document>
-          <Page size="A4" style={styles.page}>
+          <Page size="A4" style={styles.page} wrap>
             {/* Header */}
             <View style={styles.header}>
               <Text style={styles.title}>Coding Kickstarter</Text>
               <Text style={styles.tagline}>Your Day 1 Setup Plan</Text>
             </View>
 
-            <View style={styles.section}>
+            <View style={styles.section} wrap>
               <Text style={styles.sectionTitle}>Your Idea</Text>
               <Text style={styles.text}>{sanitizeTextForPDF(data.idea)}</Text>
             </View>
 
             {/* Questions & Answers */}
             {data.questions && data.questions.length > 0 && (
-              <View style={styles.section}>
+              <View style={styles.section} wrap>
                 <Text style={styles.sectionTitle}>Clarifying Questions</Text>
                 {data.questions.map((qa, i) => (
-                  <View key={i} style={styles.questionItem}>
+                  <View key={i} style={styles.questionItem} wrap={false}>
                     <Text style={styles.questionLabel}>
                       Q{i + 1}: {sanitizeTextForPDF(qa.q)}
                     </Text>
-                    <Text style={styles.answerText}>
+                    <Text style={styles.answerText} wrap>
                       A: {sanitizeTextForPDF(qa.a || 'Not answered')}
                     </Text>
                   </View>
@@ -262,23 +265,39 @@ export default function PDFDownload({ data }: PDFDownloadProps) {
               </View>
             )}
 
-            {/* Setup Steps */}
+            {/* Setup Steps - Task List */}
             {data.steps && data.steps.length > 0 && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Top 5 Setup Steps</Text>
+              <View style={styles.section} wrap>
                 {data.steps.map((step, i) => (
-                  <View key={i} style={styles.stepItem}>
-                    <Text style={styles.stepTitle}>
-                      Step {i + 1}: {sanitizeTextForPDF(step.step)}
-                    </Text>
-                    {step.command && (
-                      <Text style={styles.codeBlock}>{sanitizeTextForPDF(step.command)}</Text>
+                  <View key={i} wrap={false}>
+                    {i === 0 && (
+                      <Text style={styles.sectionTitle}>Your 5 Setup Wins</Text>
                     )}
-                    {step.tip && (
-                      <Text style={styles.tipText}>
-                        💡 {sanitizeTextForPDF(step.tip)}
+                    <View style={styles.stepItem} wrap={false}>
+                      <View style={styles.stepHeader}>
+                        <View style={styles.stepCheckbox} />
+                        <Text style={styles.stepNumber}>{i + 1}</Text>
+                        <Text style={styles.stepTitle}>
+                          {sanitizeTextForPDF(step.step)}
+                        </Text>
+                        <Text 
+                          style={[
+                            styles.priorityBadge, 
+                            { backgroundColor: getPriorityColor(step.priority) }
+                          ]}
+                        >
+                          {step.priority}
+                        </Text>
+                      </View>
+                      <Text style={styles.stepExplanation} wrap>
+                        → {sanitizeTextForPDF(step.explanation)}
                       </Text>
-                    )}
+                      {step.command && (
+                        <Text style={styles.codeBlock} wrap>
+                          {sanitizeTextForPDF(step.command)}
+                        </Text>
+                      )}
+                    </View>
                   </View>
                 ))}
               </View>
@@ -286,15 +305,15 @@ export default function PDFDownload({ data }: PDFDownloadProps) {
 
             {/* MVP Blueprint */}
             {data.blueprint && data.blueprint.epics && (
-              <View style={styles.section}>
+              <View style={styles.section} wrap>
                 <Text style={styles.sectionTitle}>MVP Blueprint</Text>
                 
                 {/* Input Epics */}
                 {data.blueprint.epics.input && data.blueprint.epics.input.length > 0 && (
-                  <View style={styles.epicBox}>
+                  <View style={styles.epicBox} wrap={false}>
                     <Text style={styles.epicTitle}>Input Epics</Text>
                     {data.blueprint.epics.input.map((epic, i) => (
-                      <Text key={i} style={styles.epicItem}>
+                      <Text key={i} style={styles.epicItem} wrap>
                         • {sanitizeTextForPDF(epic)}
                       </Text>
                     ))}
@@ -303,10 +322,10 @@ export default function PDFDownload({ data }: PDFDownloadProps) {
                 
                 {/* Output Epics */}
                 {data.blueprint.epics.output && data.blueprint.epics.output.length > 0 && (
-                  <View style={styles.epicBox}>
+                  <View style={styles.epicBox} wrap={false}>
                     <Text style={styles.epicTitle}>Output Epics</Text>
                     {data.blueprint.epics.output.map((epic, i) => (
-                      <Text key={i} style={styles.epicItem}>
+                      <Text key={i} style={styles.epicItem} wrap>
                         • {sanitizeTextForPDF(epic)}
                       </Text>
                     ))}
@@ -315,10 +334,10 @@ export default function PDFDownload({ data }: PDFDownloadProps) {
                 
                 {/* Export Epics */}
                 {data.blueprint.epics.export && data.blueprint.epics.export.length > 0 && (
-                  <View style={styles.epicBox}>
+                  <View style={styles.epicBox} wrap={false}>
                     <Text style={styles.epicTitle}>Export Epics</Text>
                     {data.blueprint.epics.export.map((epic, i) => (
-                      <Text key={i} style={styles.epicItem}>
+                      <Text key={i} style={styles.epicItem} wrap>
                         • {sanitizeTextForPDF(epic)}
                       </Text>
                     ))}
@@ -327,10 +346,10 @@ export default function PDFDownload({ data }: PDFDownloadProps) {
                 
                 {/* History Epics */}
                 {data.blueprint.epics.history && data.blueprint.epics.history.length > 0 && (
-                  <View style={styles.epicBox}>
+                  <View style={styles.epicBox} wrap={false}>
                     <Text style={styles.epicTitle}>History Epics</Text>
                     {data.blueprint.epics.history.map((epic, i) => (
-                      <Text key={i} style={styles.epicItem}>
+                      <Text key={i} style={styles.epicItem} wrap>
                         • {sanitizeTextForPDF(epic)}
                       </Text>
                     ))}
@@ -338,45 +357,6 @@ export default function PDFDownload({ data }: PDFDownloadProps) {
                 )}
               </View>
             )}
-
-            {/* Kanban Board */}
-            {(() => {
-              const { headers, rows } = parseMarkdownTable(data.blueprint.kanbanMarkdown);
-              if (headers.length > 0 && rows.length > 0) {
-                return (
-                  <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Kanban Board</Text>
-                    <View style={styles.table}>
-                      {/* Header Row */}
-                      <View style={styles.tableHeader}>
-                        {headers.map((header, i) => (
-                          <Text key={i} style={styles.tableCellHeader}>
-                            {sanitizeTextForPDF(header)}
-                          </Text>
-                        ))}
-                      </View>
-                      {/* Data Rows */}
-                      {rows.map((row, i) => (
-                        <View key={i} style={styles.tableRow}>
-                          {row.map((cell, j) => {
-                            // Only clean if cell contains markdown checkboxes, otherwise use as-is
-                            const cleanedCell = cell.includes('[ ]') || cell.includes('[x]') 
-                              ? cleanMarkdownForPDF(cell) 
-                              : sanitizeTextForPDF(cell);
-                            return (
-                              <Text key={j} style={styles.tableCell}>
-                                {cleanedCell}
-                              </Text>
-                            );
-                          })}
-                        </View>
-                      ))}
-                    </View>
-                  </View>
-                );
-              }
-              return null;
-            })()}
 
             <Text style={styles.footer}>
               Generated by Coding Kickstarter - https://codingkickstarter.vercel.app

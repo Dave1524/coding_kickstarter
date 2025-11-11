@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
-import { createClient } from '@supabase/supabase-js';
+import { assertOpenAIKey } from '@/utils/env';
 
 /**
  * AI-Powered Readiness Checker
@@ -12,41 +12,11 @@ import { createClient } from '@supabase/supabase-js';
  * Body: { idea: string, answers: Record<string, string>, questionsAsked: string[] }
  */
 
-// Helper: Get OpenAI API key from env or Supabase
-async function getOpenAIKey(): Promise<string> {
-  // Try env variable first (fastest)
-  if (process.env.OPENAI_API_KEY) {
-    return process.env.OPENAI_API_KEY;
-  }
-
-  // Fallback: fetch from Supabase secrets table (if service role key exists)
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY;
-  if (serviceRoleKey && process.env.NEXT_PUBLIC_SUPABASE_URL) {
-    try {
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL,
-        serviceRoleKey
-      );
-
-      const { data, error } = await supabase
-        .from('secrets')
-        .select('api_key')
-        .eq('provider', 'openai')
-        .single();
-
-      if (!error && data?.api_key) {
-        return data.api_key;
-      }
-    } catch (err) {
-      console.warn('Failed to fetch OpenAI key from Supabase:', err);
-    }
-  }
-
-  throw new Error('OPENAI_API_KEY not found in environment or Supabase');
-}
-
 export async function POST(request: NextRequest) {
   try {
+    // Validate environment variables (server-only)
+    const apiKey = assertOpenAIKey();
+
     // Parse request body
     const body = await request.json();
     const { idea, answers, questionsAsked, skippedQuestions, maxQuestionsRemaining } = body as {
@@ -64,6 +34,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate input length
+    const trimmedIdea = idea.trim();
+    if (trimmedIdea.length < 6 || trimmedIdea.length > 499) {
+      return NextResponse.json(
+        { error: 'Idea must be between 6 and 499 characters' },
+        { status: 400 }
+      );
+    }
+
     // Validate answers
     const answerMap: Record<string, string> = 
       answers && typeof answers === 'object' && !Array.isArray(answers)
@@ -76,14 +55,12 @@ export async function POST(request: NextRequest) {
         ? questionsAsked.filter(q => typeof q === 'string')
         : [];
 
-    // Get OpenAI API key
-    const apiKey = await getOpenAIKey();
     const openai = new OpenAI({ apiKey });
 
     // Build prompt for readiness check
     const prompt = `You are an expert setup coach evaluating if you have enough information to create a detailed setup guide.
 
-User's project idea: "${idea.trim()}"
+User's project idea: "${trimmedIdea}"
 
 Questions asked and answers received:
 ${Object.entries(answerMap).map(([qId, answer]) => `- ${qId}: ${answer}`).join('\n')}
@@ -171,7 +148,7 @@ Rules:
       return NextResponse.json(
         {
           error: 'OpenAI API key not configured',
-          hint: 'Add OPENAI_API_KEY to your .env.local file and restart the server'
+          hint: 'Add OPENAI_API_KEY to your server environment variables (.env.local for local dev)'
         },
         { status: 500 }
       );
