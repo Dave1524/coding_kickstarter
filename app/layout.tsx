@@ -18,9 +18,25 @@ export const metadata: Metadata = {
   keywords: ["coding", "setup guide", "AI", "developer tools", "beginner coding", "project setup"],
   openGraph: {
     title: "Coding Kickstarter - AI-Powered Setup Guides",
-    description: "Get instant AI-generated setup guides for your coding projects",
+    description: "Get instant AI-generated setup guides for your coding projects. Turn ideas into MVPs in minutes.",
     type: "website",
-    url: "https://codingkickstarter.com",
+    url: "https://codingkickstart.com",
+    locale: "en_US",
+    images: [
+      {
+        url: "https://codingkickstart.com/images/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Coding Kickstarter - AI-Powered Setup Guides",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Coding Kickstarter - AI-Powered Setup Guides",
+    description: "Get instant AI-generated setup guides for your coding projects. Turn ideas into MVPs in minutes.",
+    images: ["https://codingkickstart.com/images/og-image.png"],
+    site: "@CodeKickstarter",
   },
 };
 
