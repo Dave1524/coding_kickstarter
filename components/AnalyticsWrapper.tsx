@@ -1,8 +1,14 @@
 'use client';
 
-import { Analytics } from '@vercel/analytics/next';
+import Script from 'next/script';
 
 export default function AnalyticsWrapper() {
-  return <Analytics />;
+  return (
+    <Script
+      strategy="afterInteractive"
+      src="https://vercel.live/script.js"
+      data-vercel-analytics="true"
+    />
+  );
 }
 
