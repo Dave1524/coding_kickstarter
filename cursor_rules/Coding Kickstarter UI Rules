@@ -1,0 +1,33 @@
+## Coding Kickstarter UI Rules
+
+**Project:** https://codingkickstarter.com (Vercel live)  
+**Target User:** Total beginners → "Ship in 10 min" delight. Zero setup paralysis.  
+**MVP Spec:** Attach `CodingKickstarter_MVP_Spec.pdf` – prioritize Top 5 Steps, AI Questions, PDF Export.  
+
+**Style Guide (Tailwind Only):**  
+- Colors: Gradient header (#6B46C1 → #9F7AEA), bg-white/dark:bg-gray-900.  
+- Typography: Inter font, h1: text-3xl sm:text-4xl, body: text-base.  
+- Layout: Mobile-first (375px+), max-w-4xl mx-auto, p-4 sm:p-6.  
+- Components: Clean CTAs (bg-purple-600 hover:bg-purple-700), code blocks (bg-gray-100 p-4 rounded-md, monospace).  
+- A11y: AA contrast (4.5:1 min), labels on inputs, ARIA for dynamic content.  
+- Perf: <10s load, no console errors, mobile PDF downloads.  
+
+**Playwright Verification Workflow (Auto-Trigger on UI Changes):**  
+Use Playwright MCP:  
+1. `await page.goto('https://codingkickstarter.com');`  
+2. Emulate viewports: desktop (1440x1024), tablet (768x1024), mobile (375x667).  
+3. Screenshot: `await page.screenshot({ path: 'review-${viewport}.png' });`  
+4. Interact: Type "Todo app with login" → Click Generate → Wait for output → Click PDF → Verify download.  
+5. Check: Console logs (`page.on('console', ...)`), network errors, A11y (axe-core if installed).  
+6. Compare: To spec (gradient header, clean steps layout). Flag overflows, low contrast, cut-off buttons.  
+
+**Agentic Loop in Composer:**  
+- Step 1: Run Playwright → Analyze screenshots/logs vs. spec.  
+- Step 2: Grade A–F; List 3–5 fixes with Tailwind code snippets.  
+- Step 3: Ask: "Apply fixes? Y/N" → If Y, edit files → Re-run verification.  
+- Repeat until A grade. Use git worktrees for parallel A/B (e.g., glassmorphism header variant).  
+
+**Principles:**  
+- One CTA/screen (e.g., "Drop Idea" > "Generate").  
+- Progress indicators: Input → Questions → Steps → Export.  
+- No new libs; Tailwind + Next.js only.  

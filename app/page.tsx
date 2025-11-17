@@ -11,6 +11,11 @@ import SkipBanner from '@/components/SkipBanner';
 import SkipWarning from '@/components/SkipWarning';
 import DraftBanner from '@/components/DraftBanner';
 import TaskList from '@/components/TaskList';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent } from '@/components/ui/card';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { validateAnswer, validateIdea } from '@/lib/validation';
 import { useAutoSave, loadDraft, clearDraft } from '@/hooks/useAutoSave';
 import { validateGenerateQuestionsResponse, validateCheckReadinessResponse, validateGenerateResponse } from '@/lib/api-validation';
@@ -545,25 +550,28 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex flex-col">
-      <div className="max-w-4xl mx-auto w-full flex-1 p-4 sm:p-8">
+    <div className="min-h-screen bg-background flex flex-col">
+      <ThemeToggle />
+      <div className="max-w-4xl mx-auto w-full flex-1 p-4 sm:p-6">
         {/* Header */}
-        <header className="text-center mb-10 sm:mb-12 pt-6 sm:pt-8 animate-fade-in">
+        <header className="text-center mb-10 sm:mb-12 pt-6 sm:pt-8 animate-fade-in overflow-visible">
           <div className="inline-flex items-center justify-center mb-4">
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full blur-xl opacity-30 animate-pulse"></div>
-              <div className="relative bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-full p-4 shadow-lg">
+              <div className="absolute inset-0 bg-gradient-to-r from-[#6B46C1] to-[#9F7AEA] rounded-full blur-xl opacity-30 animate-pulse"></div>
+              <div className="relative bg-gradient-to-r from-[#6B46C1] to-[#9F7AEA] rounded-full p-4 shadow-lg">
                 <span className="text-4xl">🚀</span>
               </div>
             </div>
           </div>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-4 tracking-tight">
-            Coding Kickstarter
-          </h1>
-          <p className="text-lg sm:text-xl text-gray-700 max-w-2xl mx-auto leading-relaxed">
+          <div className="px-4 py-4 pb-8 mb-6 overflow-visible">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#6B46C1] to-[#9F7AEA] bg-clip-text text-transparent tracking-tight inline-block leading-relaxed py-2 px-1">
+              Coding Kickstarter
+            </h1>
+          </div>
+          <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             No setup paralysis, just code!
           </p>
-          <div className="mt-4 flex items-center justify-center gap-2 text-sm text-gray-600">
+          <div className="mt-4 flex items-center justify-center gap-2 text-sm text-muted-foreground">
             <span className="flex items-center gap-1">
               <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
               Powered by AI
@@ -581,34 +589,35 @@ export default function Home() {
 
         {/* Input Form */}
         <form onSubmit={handleSubmit} className="mb-12 animate-fade-in">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 sm:p-8 border border-purple-200/50 hover:shadow-2xl transition-all duration-300">
-            <label htmlFor="idea" className="block text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-              <span className="text-2xl">💡</span>
-              <span>What do you want to build?</span>
-            </label>
-            <textarea
-              id="idea"
-              value={idea}
-              onChange={(e) => setIdea(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey && !loading && !loadingQuestions && idea.trim() && questionSet.length === 0) {
-                  e.preventDefault();
-                  const form = e.currentTarget.closest('form');
-                  if (form) {
-                    form.requestSubmit();
+          <Card className="hover:shadow-2xl transition-all duration-300">
+            <CardContent className="p-6 sm:p-8">
+              <Label htmlFor="idea" className="block text-lg font-semibold mb-4 flex items-center gap-2">
+                <span className="text-2xl">💡</span>
+                <span>What do you want to build?</span>
+              </Label>
+              <textarea
+                id="idea"
+                value={idea}
+                onChange={(e) => setIdea(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey && !loading && !loadingQuestions && idea.trim() && questionSet.length === 0) {
+                    e.preventDefault();
+                    const form = e.currentTarget.closest('form');
+                    if (form) {
+                      form.requestSubmit();
+                    }
                   }
-                }
-              }}
-              placeholder="e.g., Todo app for 100 users, chat app for teams, weather dashboard..."
-              className="w-full px-4 py-3 text-lg text-gray-900 border-2 border-gray-300 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all resize-none font-sans"
-              rows={4}
-              disabled={loading || loadingQuestions}
-              aria-describedby="idea-description"
-              aria-required="true"
-            />
-            <p id="idea-description" className="sr-only">
-              Enter your project idea. This will be used to generate personalized setup questions.
-            </p>
+                }}
+                placeholder="e.g., Todo app with login"
+                className="flex min-h-[100px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 resize-none md:text-sm"
+                rows={4}
+                disabled={loading || loadingQuestions}
+                aria-describedby="idea-description"
+                aria-required="true"
+              />
+              <p id="idea-description" className="sr-only">
+                Enter your project idea. This will be used to generate personalized setup questions.
+              </p>
 
             {/* Loading Questions State */}
             {loadingQuestions && (
@@ -633,7 +642,7 @@ export default function Home() {
 
             {/* Questions */}
             {!loadingQuestions && questionSet.length > 0 && questionIndex < questionSet.length && (
-              <div className="mt-6 space-y-2 animate-fade-in" role="region" aria-label="Questionnaire">
+              <div className="mt-6 space-y-2 animate-fade-in" role="region" aria-label="Questionnaire" aria-live="polite">
                 {/* Progress Bar */}
                 <ProgressBar
                   answered={Object.keys(answers).length}
@@ -647,14 +656,14 @@ export default function Home() {
                   totalQuestions={questionSet.length}
                 />
                 
-                <label htmlFor={`question-${questionSet[questionIndex].id}`} className="block text-lg font-semibold text-gray-800">
+                <Label htmlFor={`question-${questionSet[questionIndex].id}`} className="block text-lg font-semibold">
                   {questionSet[questionIndex].text}
-                </label>
+                </Label>
                 {questionSet[questionIndex].type === 'select' && questionSet[questionIndex].options ? (
                   <select
                     ref={(el) => { inputRef.current = el; }}
                     id={`question-${questionSet[questionIndex].id}`}
-                    className="w-full px-4 py-3 text-lg text-gray-900 border-2 border-gray-300 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all font-sans"
+                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
                     value={currentAnswer}
                     onChange={(e) => {
                       setCurrentAnswer(e.target.value);
@@ -687,11 +696,10 @@ export default function Home() {
                     ))}
                   </select>
                 ) : (
-                  <input
+                  <Input
                     ref={(el) => { inputRef.current = el; }}
                     id={`question-${questionSet[questionIndex].id}`}
                     type="text"
-                    className="w-full px-4 py-3 text-lg text-gray-900 border-2 border-gray-300 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all font-sans"
                     placeholder={questionSet[questionIndex].placeholder || 'Type your answer...'}
                     value={currentAnswer}
                     onChange={(e) => {
@@ -874,28 +882,30 @@ export default function Home() {
 
               {/* Skip Question Button - shown when questions exist */}
               {questionSet.length > 0 && questionIndex < questionSet.length && !showSkipBanner && (
-                <button
+                <Button
                   type="button"
+                  variant="outline"
                   onClick={() => setShowSkipBanner(true)}
                   disabled={loading || loadingQuestions}
-                  className="px-6 py-4 border-2 border-yellow-300 text-yellow-700 bg-white rounded-xl hover:bg-yellow-50 font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed text-lg shadow-lg hover:shadow-xl disabled:shadow-lg"
+                  className="w-full sm:w-auto"
                   aria-label="Skip this question"
                 >
                   ⏭️ Skip
-                </button>
+                </Button>
               )}
 
               {/* Previous Question Button - shown when not on first question */}
               {questionSet.length > 0 && questionIndex > 0 && questionIndex < questionSet.length && (
-                <button
+                <Button
                   type="button"
+                  variant="outline"
                   onClick={handlePreviousQuestion}
                   disabled={loading || loadingQuestions}
-                  className="px-6 py-4 border-2 border-gray-300 text-gray-700 bg-white rounded-xl hover:bg-gray-50 font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed text-lg shadow-lg hover:shadow-xl disabled:shadow-lg"
+                  className="w-full sm:w-auto"
                   aria-label="Go to previous question"
                 >
                   ← Previous
-                </button>
+                </Button>
               )}
 
               {/* Skip Warning - shown when ready to generate with skips */}
@@ -906,16 +916,18 @@ export default function Home() {
               )}
 
               {/* Early Access Button */}
-              <button
+              <Button
                 type="button"
+                variant="outline"
                 onClick={() => setEarlyOpen(true)}
                 disabled={loading || loadingQuestions}
-                className="flex-1 px-6 py-4 border-2 border-purple-300 text-purple-700 bg-white rounded-xl hover:bg-purple-50 font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed text-lg shadow-lg hover:shadow-xl disabled:shadow-lg"
+                className="w-full sm:w-auto"
               >
                 Sign up for early access
-              </button>
+              </Button>
             </div>
-          </div>
+            </CardContent>
+          </Card>
         </form>
 
         {/* Error Message */}
@@ -946,7 +958,7 @@ export default function Home() {
 
         {/* Results */}
         {result && (
-          <div className="space-y-8 animate-fade-in">
+          <div className="space-y-8 animate-fade-in" role="region" aria-label="Setup Steps" aria-live="polite">
             {/* Task List */}
             <TaskList
               tasks={result.output.top5.map((step, i) => {
@@ -986,60 +998,62 @@ export default function Home() {
 
             {/* MVP Blueprint */}
             {result.output.blueprint && (
-              <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 sm:p-8 border border-blue-200/50 hover:shadow-2xl transition-all duration-300 animate-slide-in">
-                <h2 className="text-2xl sm:text-3xl font-bold text-blue-600 mb-6 flex items-center gap-2">
-                  <span>🗺️</span>
-                  <span>MVP Blueprint</span>
-                </h2>
-                <div className="space-y-4">
-                  {result.output.blueprint.epics.input && result.output.blueprint.epics.input.length > 0 && (
-                    <div>
-                      <h3 className="font-semibold text-gray-700 mb-2">Input Epics:</h3>
-                      <ul className="list-disc list-inside space-y-1 text-gray-600">
-                        {result.output.blueprint.epics.input.map((epic, i) => (
-                          <li key={i}>{epic}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  {result.output.blueprint.epics.output && result.output.blueprint.epics.output.length > 0 && (
-                    <div>
-                      <h3 className="font-semibold text-gray-700 mb-2">Output Epics:</h3>
-                      <ul className="list-disc list-inside space-y-1 text-gray-600">
-                        {result.output.blueprint.epics.output.map((epic, i) => (
-                          <li key={i}>{epic}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  {result.output.blueprint.epics.export && result.output.blueprint.epics.export.length > 0 && (
-                    <div>
-                      <h3 className="font-semibold text-gray-700 mb-2">Export Epics:</h3>
-                      <ul className="list-disc list-inside space-y-1 text-gray-600">
-                        {result.output.blueprint.epics.export.map((epic, i) => (
-                          <li key={i}>{epic}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  {result.output.blueprint.epics.history && result.output.blueprint.epics.history.length > 0 && (
-                    <div>
-                      <h3 className="font-semibold text-gray-700 mb-2">History Epics:</h3>
-                      <ul className="list-disc list-inside space-y-1 text-gray-600">
-                        {result.output.blueprint.epics.history.map((epic, i) => (
-                          <li key={i}>{epic}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              </div>
+              <Card className="animate-slide-in">
+                <CardContent className="p-6 sm:p-8">
+                  <h2 className="text-2xl sm:text-3xl font-bold mb-6 flex items-center gap-2">
+                    <span>🗺️</span>
+                    <span>MVP Blueprint</span>
+                  </h2>
+                  <div className="space-y-4">
+                    {result.output.blueprint.epics.input && result.output.blueprint.epics.input.length > 0 && (
+                      <div>
+                        <h3 className="font-semibold text-foreground mb-2">Input Epics:</h3>
+                        <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                          {result.output.blueprint.epics.input.map((epic, i) => (
+                            <li key={i}>{epic}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {result.output.blueprint.epics.output && result.output.blueprint.epics.output.length > 0 && (
+                      <div>
+                        <h3 className="font-semibold text-foreground mb-2">Output Epics:</h3>
+                        <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                          {result.output.blueprint.epics.output.map((epic, i) => (
+                            <li key={i}>{epic}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {result.output.blueprint.epics.export && result.output.blueprint.epics.export.length > 0 && (
+                      <div>
+                        <h3 className="font-semibold text-foreground mb-2">Export Epics:</h3>
+                        <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                          {result.output.blueprint.epics.export.map((epic, i) => (
+                            <li key={i}>{epic}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {result.output.blueprint.epics.history && result.output.blueprint.epics.history.length > 0 && (
+                      <div>
+                        <h3 className="font-semibold text-foreground mb-2">History Epics:</h3>
+                        <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                          {result.output.blueprint.epics.history.map((epic, i) => (
+                            <li key={i}>{epic}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
             )}
 
             {/* Action Buttons */}
             <div className="space-y-4 pt-4">
               {/* Row 1: PDF Download and Save Sprint */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <div className="flex flex-col sm:flex-row gap-4 w-full justify-center items-center">
                 <PDFDownload
                   data={{
                     idea: result.idea,
@@ -1085,10 +1099,11 @@ export default function Home() {
                     },
                   }}
                 />
-                <button
+                <Button
                   onClick={handleSave}
                   disabled={isSaving || !result}
-                  className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg hover:shadow-xl flex items-center gap-2"
+                  variant="default"
+                  className="w-full sm:w-auto"
                 >
                   {isSaving ? (
                     <span className="flex items-center gap-2">
@@ -1104,18 +1119,19 @@ export default function Home() {
                       <span>Save Sprint</span>
                     </>
                   )}
-                </button>
+                </Button>
               </div>
               
               {/* Row 2: Early Access Sign Up */}
               <div className="flex justify-center">
-                <button
+                <Button
                   onClick={() => setEarlyOpen(true)}
-                  className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                  variant="default"
+                  className="w-full sm:w-auto"
                 >
                   <span>🎉</span>
                   <span>Sign up for early access</span>
-                </button>
+                </Button>
               </div>
             </div>
 
@@ -1149,7 +1165,7 @@ export default function Home() {
 
             {/* Try Again */}
             <div className="text-center pt-4">
-              <button
+              <Button
                 onClick={() => {
                   setResult(null);
                   setIdea('');
@@ -1163,11 +1179,12 @@ export default function Home() {
                   setSaveError('');
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
-                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl inline-flex items-center gap-2"
+                variant="outline"
+                className="w-full sm:w-auto"
               >
                 <span>←</span>
                 <span>Try another idea</span>
-              </button>
+              </Button>
             </div>
           </div>
         )}

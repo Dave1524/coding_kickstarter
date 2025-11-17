@@ -46,3 +46,9 @@ CREATE POLICY "Allow service role full access"
 CREATE INDEX IF NOT EXISTS idx_early_access_emails_email ON public.early_access_emails(email);
 CREATE INDEX IF NOT EXISTS idx_early_access_emails_created_at ON public.early_access_emails(created_at DESC);
 
+
+
+
+
+
+

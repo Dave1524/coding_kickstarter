@@ -19,3 +19,8 @@ DROP CONSTRAINT IF EXISTS generated_sprints_user_id_fkey;
 -- REFERENCES auth.users(id) 
 -- ON DELETE SET NULL;
 
+
+
+
+
+

@@ -95,3 +95,9 @@ After applying either fix, test the email registration again. It should work!
 
 4. **Restart your dev server** after making changes
 
+
+
+
+
+
+

@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { Progress } from '@/components/ui/progress';
 
 interface ProgressBarProps {
   answered: number;
@@ -14,7 +15,7 @@ export default function ProgressBar({ answered, total, maxQuestions }: ProgressB
   
   return (
     <div className="mt-4 space-y-2">
-      <div className="flex items-center justify-between text-sm text-gray-600 mb-1">
+      <div className="flex items-center justify-between text-sm text-muted-foreground mb-1">
         <span>
           Question {answered + 1} of {total}
           {isAtMax && (
@@ -23,21 +24,19 @@ export default function ProgressBar({ answered, total, maxQuestions }: ProgressB
             </span>
           )}
         </span>
-        <span className="font-semibold">{Math.round(progress)}%</span>
+        <span className="font-semibold text-foreground">{Math.round(progress)}%</span>
       </div>
-      <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-        <div
-          className="bg-gradient-to-r from-purple-600 to-pink-600 h-3 rounded-full transition-all duration-300 ease-out"
-          style={{ width: `${progress}%` }}
-          role="progressbar"
-          aria-valuenow={Math.round(progress)}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-label={`Progress: ${Math.round(progress)}%`}
-        />
-      </div>
+      <Progress 
+        value={progress} 
+        className="h-3"
+        aria-label={`Questionnaire Progress`}
+        aria-valuenow={Math.round(progress)}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        role="progressbar"
+      />
       {isAtMax && answered < total && (
-        <p className="text-xs text-gray-500 italic mt-1">
+        <p className="text-xs text-muted-foreground italic mt-1">
           We'll use what you've provided to finish your guide
         </p>
       )}

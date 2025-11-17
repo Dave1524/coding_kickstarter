@@ -1,6 +1,8 @@
 'use client';
 
 import React from 'react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 type CTAState = 
   | 'idle' 
@@ -90,7 +92,7 @@ export default function PrimaryCTA({
           label: 'Start Questionnaire',
           disabled: loading || loadingQuestions || !idea.trim(),
           onClick: onStart,
-          className: 'flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-4 px-6 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-lg shadow-lg hover:shadow-xl disabled:shadow-lg',
+          className: 'flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-6 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-lg shadow-lg hover:shadow-xl disabled:shadow-lg',
           showSpinner: loadingQuestions,
           spinnerText: 'Generating questions...',
         };
@@ -100,7 +102,7 @@ export default function PrimaryCTA({
           label: 'Next Question',
           disabled: loading || loadingQuestions || !currentAnswer.trim(),
           onClick: onNext,
-          className: 'flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-4 px-6 rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-lg shadow-lg hover:shadow-xl disabled:shadow-lg',
+          className: 'flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-6 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-lg shadow-lg hover:shadow-xl disabled:shadow-lg',
           showSpinner: false,
           spinnerText: '',
         };
@@ -110,7 +112,7 @@ export default function PrimaryCTA({
           label: 'Finish & Check',
           disabled: loading || loadingQuestions || !currentAnswer.trim(),
           onClick: onNext,
-          className: 'flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-4 px-6 rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-lg shadow-lg hover:shadow-xl disabled:shadow-lg',
+          className: 'flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-6 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-lg shadow-lg hover:shadow-xl disabled:shadow-lg',
           showSpinner: false,
           spinnerText: '',
         };
@@ -120,7 +122,7 @@ export default function PrimaryCTA({
           label: 'Checking readiness...',
           disabled: true,
           onClick: () => {},
-          className: 'flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-4 px-6 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-lg shadow-lg',
+          className: 'flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-6 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-lg shadow-lg',
           showSpinner: true,
           spinnerText: 'Checking readiness...',
         };
@@ -130,7 +132,7 @@ export default function PrimaryCTA({
           label: 'Preparing your guide...',
           disabled: true,
           onClick: () => {},
-          className: 'flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-4 px-6 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-lg shadow-lg',
+          className: 'flex-1 bg-gradient-to-r from-[#6B46C1] to-[#9F7AEA] text-white font-bold py-4 px-6 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-lg shadow-lg',
           showSpinner: true,
           spinnerText: 'Preparing your guide...',
         };
@@ -150,7 +152,7 @@ export default function PrimaryCTA({
           label: 'Continue',
           disabled: false,
           onClick: onNext,
-          className: 'flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-4 px-6 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-lg shadow-lg hover:shadow-xl disabled:shadow-lg',
+          className: 'flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-6 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-lg shadow-lg hover:shadow-xl disabled:shadow-lg',
           showSpinner: false,
           spinnerText: '',
         };
@@ -160,11 +162,12 @@ export default function PrimaryCTA({
   const buttonProps = getButtonProps();
 
   return (
-    <button
+    <Button
       type={state === 'idle' ? 'submit' : 'button'}
+      variant="default"
       disabled={buttonProps.disabled}
       onClick={buttonProps.onClick}
-      className={buttonProps.className}
+      className={cn('w-full sm:w-auto', buttonProps.className)}
     >
       {buttonProps.showSpinner ? (
         <span className="flex items-center justify-center gap-2">
@@ -177,7 +180,7 @@ export default function PrimaryCTA({
       ) : (
         buttonProps.label
       )}
-    </button>
+    </Button>
   );
 }
 

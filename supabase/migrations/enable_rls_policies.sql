@@ -55,3 +55,9 @@ CREATE INDEX IF NOT EXISTS idx_generated_sprints_user_id ON generated_sprints(us
 -- Add index on created_at for sorting
 CREATE INDEX IF NOT EXISTS idx_generated_sprints_created_at ON generated_sprints(created_at DESC);
 
+
+
+
+
+
+

@@ -119,3 +119,9 @@ If you're still getting errors:
 3. Verify your Supabase project URL and keys are correct
 4. Ensure the tables exist and RLS policies are set up correctly
 
+
+
+
+
+
+
