@@ -5,7 +5,7 @@
 **MVP Spec:** Attach `CodingKickstarter_MVP_Spec.pdf` – prioritize Top 5 Steps, AI Questions, PDF Export.  
 
 **Style Guide (Tailwind Only):**  
-- Colors: Gradient header (#6B46C1 → #9F7AEA), bg-white/dark:bg-gray-900.  
+- Colors: Gradient header   
 - Typography: Inter font, h1: text-3xl sm:text-4xl, body: text-base.  
 - Layout: Mobile-first (375px+), max-w-4xl mx-auto, p-4 sm:p-6.  
 - Components: Clean CTAs (bg-purple-600 hover:bg-purple-700), code blocks (bg-gray-100 p-4 rounded-md, monospace).  

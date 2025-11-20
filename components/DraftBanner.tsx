@@ -18,7 +18,7 @@ export default function DraftBanner({ onResume, onDiscard }: DraftBannerProps) {
   const totalQuestions = draft.questionSet?.length || 0;
   
   return (
-    <div className="mb-6 bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-200 rounded-xl p-6 shadow-lg animate-fade-in" role="alert">
+    <div className="mb-6 bg-gradient-to-r from-primary/10 to-secondary/10 border-2 border-primary/20 rounded-xl p-6 shadow-lg animate-fade-in" role="alert">
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
           <h3 className="text-lg font-bold text-gray-800 mb-2 flex items-center gap-2">
@@ -33,7 +33,7 @@ export default function DraftBanner({ onResume, onDiscard }: DraftBannerProps) {
           <div className="flex gap-3">
             <button
               onClick={onResume}
-              className="px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 font-semibold transition-all"
+              className="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 font-semibold transition-all"
             >
               Resume Draft
             </button>

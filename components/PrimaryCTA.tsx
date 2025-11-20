@@ -92,7 +92,7 @@ export default function PrimaryCTA({
           label: 'Start Questionnaire',
           disabled: loading || loadingQuestions || !idea.trim(),
           onClick: onStart,
-          className: 'flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-6 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-lg shadow-lg hover:shadow-xl disabled:shadow-lg',
+          className: 'flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-4 px-6 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-lg',
           showSpinner: loadingQuestions,
           spinnerText: 'Generating questions...',
         };
@@ -102,7 +102,7 @@ export default function PrimaryCTA({
           label: 'Next Question',
           disabled: loading || loadingQuestions || !currentAnswer.trim(),
           onClick: onNext,
-          className: 'flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-6 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-lg shadow-lg hover:shadow-xl disabled:shadow-lg',
+          className: 'flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-4 px-6 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-lg',
           showSpinner: false,
           spinnerText: '',
         };
@@ -112,7 +112,7 @@ export default function PrimaryCTA({
           label: 'Finish & Check',
           disabled: loading || loadingQuestions || !currentAnswer.trim(),
           onClick: onNext,
-          className: 'flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-6 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-lg shadow-lg hover:shadow-xl disabled:shadow-lg',
+          className: 'flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-4 px-6 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-lg',
           showSpinner: false,
           spinnerText: '',
         };
@@ -122,7 +122,7 @@ export default function PrimaryCTA({
           label: 'Checking readiness...',
           disabled: true,
           onClick: () => {},
-          className: 'flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-6 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-lg shadow-lg',
+          className: 'flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-4 px-6 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-lg shadow-lg',
           showSpinner: true,
           spinnerText: 'Checking readiness...',
         };
@@ -132,7 +132,7 @@ export default function PrimaryCTA({
           label: 'Preparing your guide...',
           disabled: true,
           onClick: () => {},
-          className: 'flex-1 bg-gradient-to-r from-[#6B46C1] to-[#9F7AEA] text-white font-bold py-4 px-6 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-lg shadow-lg',
+          className: 'flex-1 bg-primary text-primary-foreground font-bold py-4 px-6 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-lg',
           showSpinner: true,
           spinnerText: 'Preparing your guide...',
         };
@@ -142,7 +142,7 @@ export default function PrimaryCTA({
           label: 'Retry',
           disabled: loading || loadingQuestions,
           onClick: onRetry,
-          className: 'flex-1 bg-gradient-to-r from-red-600 to-orange-600 text-white font-bold py-4 px-6 rounded-xl hover:from-red-700 hover:to-orange-700 transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-lg shadow-lg hover:shadow-xl disabled:shadow-lg',
+          className: 'flex-1 bg-gradient-to-r from-red-600 to-orange-600 text-white font-bold py-4 px-6 rounded-xl hover:from-red-700 hover:to-orange-700 transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-lg',
           showSpinner: loading || loadingQuestions,
           spinnerText: 'Retrying...',
         };
@@ -152,7 +152,7 @@ export default function PrimaryCTA({
           label: 'Continue',
           disabled: false,
           onClick: onNext,
-          className: 'flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-6 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-lg shadow-lg hover:shadow-xl disabled:shadow-lg',
+          className: 'flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-4 px-6 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-lg',
           showSpinner: false,
           spinnerText: '',
         };
@@ -167,7 +167,13 @@ export default function PrimaryCTA({
       variant="default"
       disabled={buttonProps.disabled}
       onClick={buttonProps.onClick}
-      className={cn('w-full sm:w-auto', buttonProps.className)}
+      className={cn(
+        'w-full sm:w-auto',
+        buttonProps.className,
+        // Add clear disabled state styling
+        buttonProps.disabled && 'opacity-50 cursor-not-allowed'
+      )}
+      aria-disabled={buttonProps.disabled}
     >
       {buttonProps.showSpinner ? (
         <span className="flex items-center justify-center gap-2">

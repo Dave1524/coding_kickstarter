@@ -79,7 +79,7 @@ export default function EarlyAccessModal({ open, onClose, idea, source }: EarlyA
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8 animate-fade-in border border-purple-200/50">
+      <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8 animate-fade-in border border-primary/20">
         {/* Close button */}
         <button
           onClick={handleClose}
@@ -129,7 +129,7 @@ export default function EarlyAccessModal({ open, onClose, idea, source }: EarlyA
           </div>
         ) : (
           <>
-            <h2 className="text-2xl sm:text-3xl font-bold text-purple-600 mb-2 flex items-center gap-2">
+            <h2 className="text-2xl sm:text-3xl font-bold text-primary mb-2 flex items-center gap-2">
               <span>🎉</span>
               <span>Sign up for early access</span>
             </h2>
@@ -151,7 +151,7 @@ export default function EarlyAccessModal({ open, onClose, idea, source }: EarlyA
                     setError('');
                   }}
                   placeholder="your@email.com"
-                  className="w-full px-4 py-3 text-lg text-gray-900 border-2 border-gray-300 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all font-sans"
+                  className="w-full px-4 py-3 text-lg text-gray-900 border-2 border-gray-300 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-sans"
                   disabled={loading}
                   required
                   autoFocus
@@ -159,7 +159,7 @@ export default function EarlyAccessModal({ open, onClose, idea, source }: EarlyA
               </div>
 
               {error && (
-                <div className="bg-red-50 border-2 border-red-300 text-red-800 px-4 py-3 rounded-xl">
+                <div className="bg-destructive/10 border-2 border-destructive/30 text-destructive-foreground px-4 py-3 rounded-xl">
                   <p className="text-sm font-semibold flex items-center gap-2">
                     <span>⚠️</span>
                     <span>{error}</span>
@@ -179,7 +179,7 @@ export default function EarlyAccessModal({ open, onClose, idea, source }: EarlyA
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg hover:shadow-xl"
+                  className="flex-1 px-6 py-3 bg-primary text-primary-foreground font-bold rounded-xl hover:opacity-90 transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
                   {loading ? (
                     <span className="flex items-center justify-center gap-2">

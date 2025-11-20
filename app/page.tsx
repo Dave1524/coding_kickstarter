@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import Link from 'next/link';
 import PDFDownload from '@/components/PDFDownload';
 import EarlyAccessModal from '@/components/EarlyAccessModal';
 import PrimaryCTA from '@/components/PrimaryCTA';
@@ -13,8 +14,18 @@ import DraftBanner from '@/components/DraftBanner';
 import TaskList from '@/components/TaskList';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+// Temporarily disabled Select import due to Turbopack module resolution issue
+// TODO: Re-enable once Turbopack resolves @radix-ui/react-select properly
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/select";
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { validateAnswer, validateIdea } from '@/lib/validation';
 import { useAutoSave, loadDraft, clearDraft } from '@/hooks/useAutoSave';
@@ -22,6 +33,7 @@ import { validateGenerateQuestionsResponse, validateCheckReadinessResponse, vali
 import { sanitizeInput, checkRateLimit, escapeHtml } from '@/lib/security';
 import { sanitizeInputSync } from '@/lib/security-client';
 import { analytics } from '@/lib/analytics';
+import { featureFlags } from '@/lib/feature-flags';
 
 type Question = {
   id: string;
@@ -89,7 +101,7 @@ export default function Home() {
   const [questionsAddedCount, setQuestionsAddedCount] = useState(0);
   const [showDraftBanner, setShowDraftBanner] = useState(false);
   const [errorDetailsExpanded, setErrorDetailsExpanded] = useState(false);
-  const inputRef = useRef<HTMLInputElement | HTMLSelectElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement | null>(null);
 
   // Auto-save draft
   useAutoSave(idea, answers, questionTexts, questionSet, questionIndex, skippedQuestions);
@@ -551,34 +563,94 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <ThemeToggle />
-      <div className="max-w-4xl mx-auto w-full flex-1 p-4 sm:p-6">
-        {/* Header */}
-        <header className="text-center mb-10 sm:mb-12 pt-6 sm:pt-8 animate-fade-in overflow-visible">
-          <div className="inline-flex items-center justify-center mb-4">
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-[#6B46C1] to-[#9F7AEA] rounded-full blur-xl opacity-30 animate-pulse"></div>
-              <div className="relative bg-gradient-to-r from-[#6B46C1] to-[#9F7AEA] rounded-full p-4 shadow-lg">
-                <span className="text-4xl">🚀</span>
-              </div>
+      {/* Navbar */}
+      <nav className="w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <div className="flex items-center">
+              <Link href="/" className="flex items-center gap-2">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-primary rounded-full blur-sm opacity-30"></div>
+                  <div className="relative bg-primary rounded-full p-2">
+                    <span className="text-xl">🚀</span>
+                  </div>
+                </div>
+                <span className="text-xl font-bold bg-gradient-to-r from-primary to-chart-1 bg-clip-text text-transparent">
+                  Coding Kickstarter
+                </span>
+              </Link>
+            </div>
+
+            {/* Navigation Links - Center */}
+            <div className="hidden md:flex items-center gap-6 flex-1 justify-center">
+              <Link href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Features
+              </Link>
+              <Link href="#how-it-works" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                How It Works
+              </Link>
+              <Link href="#examples" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Examples
+              </Link>
+              <Link href="/history" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                History
+              </Link>
+              {featureFlags.showPricing && (
+                <Link href="#pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                  Pricing
+                </Link>
+              )}
+            </div>
+
+            {/* CTA Buttons - Right */}
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Button variant="ghost" size="sm" className="hidden sm:inline-flex" asChild>
+                <Link href="#login">Login</Link>
+              </Button>
+              <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs sm:text-sm rounded-xl" asChild>
+                <Link href="#join">Join up</Link>
+              </Button>
+              <ThemeToggle />
             </div>
           </div>
-          <div className="px-4 py-4 pb-8 mb-6 overflow-visible">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#6B46C1] to-[#9F7AEA] bg-clip-text text-transparent tracking-tight inline-block leading-relaxed py-2 px-1">
-              Coding Kickstarter
-            </h1>
-          </div>
-          <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            No setup paralysis, just code!
-          </p>
-          <div className="mt-4 flex items-center justify-center gap-2 text-sm text-muted-foreground">
-            <span className="flex items-center gap-1">
-              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-              Powered by AI
-            </span>
-          </div>
-        </header>
+        </div>
+      </nav>
 
+      {/* Hero Section */}
+      <section className="relative w-full h-screen flex items-end overflow-hidden">
+        {/* Unicorn.studio Background Element - Reserved for future interactive background */}
+        <div 
+          id="unicorn-studio-background" 
+          className="absolute inset-0 z-0"
+          aria-label="Interactive background element reserved for unicorn.studio integration"
+        />
+
+        {/* Hero Content */}
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20 md:pb-24">
+          <div className="max-w-3xl">
+            <h1 className="text-3xl sm:text-4xl font-bold leading-tight mb-6">
+              <span className="bg-gradient-to-r from-primary to-chart-1 bg-clip-text text-transparent">
+                NO SETUP PARALYSIS, JUST CODE!
+              </span>
+            </h1>
+            <div className="mt-6 sm:mt-8">
+              <Button 
+                size="lg" 
+                className="bg-primary hover:bg-primary/90 text-primary-foreground text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 h-auto rounded-xl"
+                onClick={() => {
+                  document.getElementById('main-content')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+              >
+                Try it out
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Main Content */}
+      <div id="main-content" className="max-w-4xl mx-auto w-full flex-1 p-4 sm:p-6">
         {/* Draft Banner */}
         {showDraftBanner && (
           <DraftBanner
@@ -595,7 +667,7 @@ export default function Home() {
                 <span className="text-2xl">💡</span>
                 <span>What do you want to build?</span>
               </Label>
-              <textarea
+              <Textarea
                 id="idea"
                 value={idea}
                 onChange={(e) => setIdea(e.target.value)}
@@ -609,7 +681,7 @@ export default function Home() {
                   }
                 }}
                 placeholder="e.g., Todo app with login"
-                className="flex min-h-[100px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 resize-none md:text-sm"
+                className="min-h-[100px] resize-none"
                 rows={4}
                 disabled={loading || loadingQuestions}
                 aria-describedby="idea-description"
@@ -622,7 +694,7 @@ export default function Home() {
             {/* Loading Questions State */}
             {loadingQuestions && (
               <div className="mt-6 text-center py-4 animate-fade-in" role="status" aria-live="polite">
-                <div className="flex items-center justify-center gap-2 text-purple-600">
+                <div className="flex items-center justify-center gap-2 text-primary">
                   <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -730,7 +802,7 @@ export default function Home() {
                 )}
                 {/* Validation Error Display */}
                 {validationErrors[questionSet[questionIndex].id] && (
-                  <div id={`error-${questionSet[questionIndex].id}`} className="mt-2 text-sm text-red-600 flex items-center gap-1" role="alert">
+                  <div id={`error-${questionSet[questionIndex].id}`} className="mt-2 text-sm text-destructive flex items-center gap-1" role="alert">
                     <span aria-hidden="true">⚠️</span>
                     <span>{validationErrors[questionSet[questionIndex].id]}</span>
                   </div>
@@ -766,7 +838,7 @@ export default function Home() {
                   return (
                     <div 
                       key={key} 
-                      className="flex items-start gap-2 cursor-pointer hover:bg-purple-50 p-2 rounded transition-colors"
+                      className="flex items-start gap-2 cursor-pointer hover:bg-primary/10 p-2 rounded transition-colors"
                       onClick={() => {
                         setQuestionIndex(questionIndexForAnswer);
                         setCurrentAnswer(value);
@@ -784,7 +856,7 @@ export default function Home() {
                     >
                       <span className="font-semibold text-gray-700">{question?.text.split('?')[0] || key}:</span>
                       <span>{escapeHtml(value)}</span>
-                      <span className="text-purple-600 ml-auto text-xs">✏️ Edit</span>
+                      <span className="text-primary ml-auto text-xs">✏️ Edit</span>
                     </div>
                   );
                 })}
@@ -850,7 +922,7 @@ export default function Home() {
                         <span>⚠️</span>
                         <span>Skipped</span>
                       </span>
-                      <span className="text-purple-600 ml-auto text-xs">✏️ Answer</span>
+                      <span className="text-primary ml-auto text-xs">✏️ Answer</span>
                     </div>
                   );
                 })}
@@ -887,7 +959,7 @@ export default function Home() {
                   variant="outline"
                   onClick={() => setShowSkipBanner(true)}
                   disabled={loading || loadingQuestions}
-                  className="w-full sm:w-auto"
+                  className="w-full sm:w-auto rounded-xl font-bold py-4 px-6 text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   aria-label="Skip this question"
                 >
                   ⏭️ Skip
@@ -901,7 +973,7 @@ export default function Home() {
                   variant="outline"
                   onClick={handlePreviousQuestion}
                   disabled={loading || loadingQuestions}
-                  className="w-full sm:w-auto"
+                  className="w-full sm:w-auto rounded-xl font-bold py-4 px-6 text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   aria-label="Go to previous question"
                 >
                   ← Previous
@@ -921,7 +993,8 @@ export default function Home() {
                 variant="outline"
                 onClick={() => setEarlyOpen(true)}
                 disabled={loading || loadingQuestions}
-                className="w-full sm:w-auto"
+                className="w-full sm:w-auto rounded-xl font-bold py-4 px-6 text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Sign up for early access"
               >
                 Sign up for early access
               </Button>
@@ -932,14 +1005,14 @@ export default function Home() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border-2 border-red-300 text-red-800 px-6 py-4 rounded-xl mb-8 animate-fade-in shadow-md">
+          <div className="bg-destructive/10 border-2 border-destructive/30 text-destructive-foreground px-6 py-4 rounded-xl mb-8 animate-fade-in shadow-md">
             <p className="font-bold flex items-center gap-2 mb-1">
               <span>⚠️</span>
               <span>Oops!</span>
             </p>
-            <p className="text-red-700 mb-3">{error}</p>
+            <p className="text-destructive mb-3">{error}</p>
             {errorDetailsExpanded && (
-              <div className="mt-3 p-3 bg-red-100 rounded-lg text-sm text-red-800 font-mono">
+              <div className="mt-3 p-3 bg-destructive/15 rounded-lg text-sm text-destructive-foreground font-mono">
                 {error}
               </div>
             )}
@@ -947,7 +1020,7 @@ export default function Home() {
               {!retryFunction && (
                 <button
                   onClick={() => setErrorDetailsExpanded(!errorDetailsExpanded)}
-                  className="text-sm text-red-600 hover:text-red-800 underline"
+                  className="text-sm text-destructive hover:text-destructive/80 underline"
                 >
                   {errorDetailsExpanded ? 'Hide' : 'View'} details
                 </button>
@@ -1103,7 +1176,8 @@ export default function Home() {
                   onClick={handleSave}
                   disabled={isSaving || !result}
                   variant="default"
-                  className="w-full sm:w-auto"
+                  className="w-full sm:w-auto rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-label="Save sprint to history"
                 >
                   {isSaving ? (
                     <span className="flex items-center gap-2">
@@ -1127,7 +1201,8 @@ export default function Home() {
                 <Button
                   onClick={() => setEarlyOpen(true)}
                   variant="default"
-                  className="w-full sm:w-auto"
+                  className="w-full sm:w-auto rounded-xl"
+                  aria-label="Sign up for early access"
                 >
                   <span>🎉</span>
                   <span>Sign up for early access</span>
@@ -1153,12 +1228,12 @@ export default function Home() {
 
             {/* Save Error Message */}
             {saveError && (
-              <div className="bg-red-50 border-2 border-red-300 text-red-800 px-6 py-4 rounded-xl shadow-md animate-fade-in">
+              <div className="bg-destructive/10 border-2 border-destructive/30 text-destructive-foreground px-6 py-4 rounded-xl shadow-md animate-fade-in">
                 <p className="font-bold flex items-center gap-2 mb-1">
                   <span>⚠️</span>
                   <span>Save Failed</span>
                 </p>
-                <p className="text-red-700">{saveError}</p>
+                <p className="text-destructive">{saveError}</p>
               </div>
             )}
 
@@ -1180,7 +1255,8 @@ export default function Home() {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
                 variant="outline"
-                className="w-full sm:w-auto"
+                className="w-full sm:w-auto rounded-xl"
+                aria-label="Start over with a new idea"
               >
                 <span>←</span>
                 <span>Try another idea</span>
@@ -1190,8 +1266,419 @@ export default function Home() {
         )}
       </div>
 
+      {/* Features Section */}
+      <section id="features" className="w-full py-20 sm:py-24 bg-background">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
+              <span className="bg-gradient-to-r from-primary to-chart-1 bg-clip-text text-transparent">
+                Powerful Features
+              </span>
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Everything you need to kickstart your coding journey
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Card className="border-border hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="w-12 h-12 rounded-lg bg-primary flex items-center justify-center mb-4">
+                  <span className="text-2xl">🤖</span>
+                </div>
+                <CardTitle>AI-Powered Setup Guides</CardTitle>
+                <CardDescription>
+                  Generate beginner-friendly setup steps for any project idea. No more setup paralysis—just code!
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            <Card className="border-border hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="w-12 h-12 rounded-lg bg-primary flex items-center justify-center mb-4">
+                  <span className="text-2xl">📋</span>
+                </div>
+                <CardTitle>Kanban Boards</CardTitle>
+                <CardDescription>
+                  Visualize your project structure and tasks with interactive Kanban boards. Stay organized and focused.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            <Card className="border-border hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="w-12 h-12 rounded-lg bg-primary flex items-center justify-center mb-4">
+                  <span className="text-2xl">📄</span>
+                </div>
+                <CardTitle>PDF Export</CardTitle>
+                <CardDescription>
+                  Download your setup guides and plans as beautiful PDFs. Share with your team or keep for reference.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            <Card className="border-border hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="w-12 h-12 rounded-lg bg-primary flex items-center justify-center mb-4">
+                  <span className="text-2xl">💡</span>
+                </div>
+                <CardTitle>Smart Questions</CardTitle>
+                <CardDescription>
+                  Our AI asks clarifying questions to understand your project better and generate personalized guides.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            <Card className="border-border hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="w-12 h-12 rounded-lg bg-primary flex items-center justify-center mb-4">
+                  <span className="text-2xl">🎯</span>
+                </div>
+                <CardTitle>Top 5 Setup Steps</CardTitle>
+                <CardDescription>
+                  Get prioritized setup steps with Cursor prompts, terminal commands, and Supabase tips included.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            <Card className="border-border hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="w-12 h-12 rounded-lg bg-primary flex items-center justify-center mb-4">
+                  <span className="text-2xl">💾</span>
+                </div>
+                <CardTitle>Save & History</CardTitle>
+                <CardDescription>
+                  Save your sprints and access them anytime. Build a library of your project plans and ideas.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section id="how-it-works" className="w-full py-20 sm:py-24 bg-muted/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
+              <span className="bg-gradient-to-r from-primary to-chart-1 bg-clip-text text-transparent">
+                How It Works
+              </span>
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Get from idea to code in three simple steps
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <Card className="border-border text-center">
+              <CardHeader>
+                <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center mx-auto mb-4 text-2xl font-bold text-primary-foreground">
+                  1
+                </div>
+                <CardTitle className="text-xl">Enter Your Idea</CardTitle>
+                <CardDescription>
+                  Tell us what you want to build. It can be anything—a todo app, chat app, e-commerce store, or something completely unique.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            <Card className="border-border text-center">
+              <CardHeader>
+                <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center mx-auto mb-4 text-2xl font-bold text-primary-foreground">
+                  2
+                </div>
+                <CardTitle className="text-xl">Answer Questions</CardTitle>
+                <CardDescription>
+                  Our AI asks 3-7 clarifying questions to understand your project better. Skip questions you're unsure about—we'll work with what you provide.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            <Card className="border-border text-center">
+              <CardHeader>
+                <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center mx-auto mb-4 text-2xl font-bold text-primary-foreground">
+                  3
+                </div>
+                <CardTitle className="text-xl">Get Your Guide</CardTitle>
+                <CardDescription>
+                  Receive your personalized setup guide with top 5 steps, Kanban board, MVP blueprint, and PDF export option. Start coding immediately!
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Examples Section */}
+      <section id="examples" className="w-full py-20 sm:py-24 bg-background">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
+              <span className="bg-gradient-to-r from-primary to-chart-1 bg-clip-text text-transparent">
+                Example Projects
+              </span>
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              See what you can build with Coding Kickstarter
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="border-border hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <CardTitle>Todo App for 100 Users</CardTitle>
+                <CardDescription>
+                  Build a scalable todo application with user authentication, task management, and real-time updates.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li className="flex items-center gap-2">
+                    <span className="text-primary">✓</span>
+                    User authentication & authorization
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-primary">✓</span>
+                    CRUD operations for tasks
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-primary">✓</span>
+                    Database schema & migrations
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+            <Card className="border-border hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <CardTitle>Chat App with Real-Time Messaging</CardTitle>
+                <CardDescription>
+                  Create a real-time chat application with WebSocket support, message history, and user presence.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li className="flex items-center gap-2">
+                    <span className="text-primary">✓</span>
+                    WebSocket integration
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-primary">✓</span>
+                    Message persistence
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-primary">✓</span>
+                    User presence indicators
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+            <Card className="border-border hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <CardTitle>E-Commerce Store with Payments</CardTitle>
+                <CardDescription>
+                  Launch an e-commerce platform with product catalog, shopping cart, and secure payment processing.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li className="flex items-center gap-2">
+                    <span className="text-primary">✓</span>
+                    Product management
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-primary">✓</span>
+                    Shopping cart functionality
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-primary">✓</span>
+                    Payment gateway integration
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+            <Card className="border-border hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <CardTitle>Weather App Using Public APIs</CardTitle>
+                <CardDescription>
+                  Build a weather application that fetches data from public APIs and displays forecasts beautifully.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li className="flex items-center gap-2">
+                    <span className="text-primary">✓</span>
+                    API integration
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-primary">✓</span>
+                    Location-based data
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-primary">✓</span>
+                    Responsive UI design
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* History Section */}
+      <section id="history" className="w-full py-20 sm:py-24 bg-muted/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
+              <span className="bg-gradient-to-r from-primary to-chart-1 bg-clip-text text-transparent">
+                Your Project History
+              </span>
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
+              Access all your saved sprints and project plans in one place
+            </p>
+            <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl" asChild>
+              <Link href="/history">View History →</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      {featureFlags.showPricing && (
+        <section id="pricing" className="w-full py-20 sm:py-24 bg-background">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
+                <span className="bg-gradient-to-r from-primary to-chart-1 bg-clip-text text-transparent">
+                  Simple Pricing
+                </span>
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Start building today—no credit card required
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+              <Card className="border-border">
+                <CardHeader>
+                  <CardTitle className="text-2xl">Free</CardTitle>
+                  <div className="mt-4">
+                    <span className="text-4xl font-bold">$0</span>
+                    <span className="text-muted-foreground">/forever</span>
+                  </div>
+                  <CardDescription className="mt-4">
+                    Perfect for getting started
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-3">
+                    <li className="flex items-center gap-2">
+                      <span className="text-primary">✓</span>
+                      <span>Unlimited project ideas</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-primary">✓</span>
+                      <span>AI-generated setup guides</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-primary">✓</span>
+                      <span>PDF export</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-primary">✓</span>
+                      <span>Save up to 10 sprints</span>
+                    </li>
+                  </ul>
+                </CardContent>
+                <CardFooter>
+                  <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl" asChild>
+                    <Link href="#main-content">Get Started</Link>
+                  </Button>
+                </CardFooter>
+              </Card>
+              <Card className="border-border border-2 border-primary/50 relative">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                  <span className="bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-semibold">
+                    Most Popular
+                  </span>
+                </div>
+                <CardHeader>
+                  <CardTitle className="text-2xl">Pro</CardTitle>
+                  <div className="mt-4">
+                    <span className="text-4xl font-bold">$9</span>
+                    <span className="text-muted-foreground">/month</span>
+                  </div>
+                  <CardDescription className="mt-4">
+                    For serious developers
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-3">
+                    <li className="flex items-center gap-2">
+                      <span className="text-primary">✓</span>
+                      <span>Everything in Free</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-primary">✓</span>
+                      <span>Unlimited saved sprints</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-primary">✓</span>
+                      <span>Priority AI processing</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-primary">✓</span>
+                      <span>Advanced Kanban features</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-primary">✓</span>
+                      <span>Team collaboration</span>
+                    </li>
+                  </ul>
+                </CardContent>
+                <CardFooter>
+                  <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl" asChild>
+                    <Link href="#join">Upgrade to Pro</Link>
+                  </Button>
+                </CardFooter>
+              </Card>
+              <Card className="border-border">
+                <CardHeader>
+                  <CardTitle className="text-2xl">Enterprise</CardTitle>
+                  <div className="mt-4">
+                    <span className="text-4xl font-bold">Custom</span>
+                  </div>
+                  <CardDescription className="mt-4">
+                    For teams and organizations
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-3">
+                    <li className="flex items-center gap-2">
+                      <span className="text-primary">✓</span>
+                      <span>Everything in Pro</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-primary">✓</span>
+                      <span>Custom AI models</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-primary">✓</span>
+                      <span>Dedicated support</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-primary">✓</span>
+                      <span>SLA guarantee</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-primary">✓</span>
+                      <span>On-premise deployment</span>
+                    </li>
+                  </ul>
+                </CardContent>
+                <CardFooter>
+                  <Button className="w-full rounded-xl" variant="outline" asChild>
+                    <Link href="#join">Contact Sales</Link>
+                  </Button>
+                </CardFooter>
+              </Card>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Footer - Always Visible */}
-      <footer className="text-center text-gray-500 py-6 px-4 mt-auto border-t border-gray-200/50 bg-white/50 backdrop-blur-sm">
+      <footer className="text-center text-muted-foreground py-6 px-4 mt-auto border-t border-border/50 bg-background/50 backdrop-blur-sm">
         <p className="text-sm">
           © Coding Kickstarter 2025
         </p>

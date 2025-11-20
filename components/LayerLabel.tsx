@@ -31,7 +31,7 @@ export default function LayerLabel({ questionIndex, totalQuestions }: LayerLabel
   
   return (
     <div className="mb-3 text-sm">
-      <span className="inline-flex items-center px-3 py-1 rounded-full bg-purple-100 text-purple-700 font-semibold">
+      <span className="inline-flex items-center px-3 py-1 rounded-full bg-primary/20 text-primary font-semibold">
         Layer {layer}: {layerName}
       </span>
     </div>

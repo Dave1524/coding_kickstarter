@@ -1,289 +1,386 @@
 # UI Review Report
 
-**Date:** 2025-01-27  
-**Site:** https://codingkickstarter.com  
-**Reviewer:** Code Review + Manual Analysis  
-**Reference:** `cursor_rules/UI Review Agent.md` & `cursor_rules/Coding Kickstarter UI Rules`
+**Date:** January 2025  
+**Reviewer:** Senior Designer (AI Agent)  
+**Target:** http://localhost:3000  
+**Specification:** `cursor_rules/UI Review Agent.md`
 
 ---
 
-## Grade: A
+## Grade: **B+**
 
-**Overall Assessment:** All high-priority and medium-priority fixes have been implemented. Gradient colors match spec, Inter font is applied, dark mode toggle is functional, mobile button layout is fixed, heading descender clipping resolved, button CTAs updated to solid purple per spec, ARIA labels added for accessibility, and code blocks verified to match spec. Code review and build verification confirm proper implementation. Ready for deployment.
+The application demonstrates strong adherence to design tokens and ShadCN component usage. The UI is clean, responsive, and follows mobile-first principles. Minor improvements needed in form component consistency and accessibility enhancements.
 
 ---
 
 ## Strengths
 
-- ✅ **Gradient Colors Fixed:** All gradients updated to spec purple (#6B46C1 → #9F7AEA)
-- ✅ **Inter Font Applied:** Font properly loaded and applied via `inter.className` in layout
-- ✅ **Dark Mode Implemented:** Theme toggle button added (fixed top-right), ThemeProvider integrated
-- ✅ **Mobile Button Layout:** Explicit flex containers with `w-full` for proper mobile stacking
-- ✅ **Heading Descender Fixed:** Extra bottom padding (`pb-5`) and `leading-normal` prevent "g" clipping
-- ✅ **Button CTAs Updated:** All buttons use solid purple (`bg-purple-600 hover:bg-purple-700`) per spec
-- ✅ **Code Blocks Verified:** Match spec exactly (`bg-gray-100 p-4 rounded-md font-mono`)
-- ✅ **Accessibility Enhanced:** ARIA labels added to dynamic regions, ProgressBar enhanced
-- ✅ **Build Success:** TypeScript compilation passes, no errors
-- ✅ **Overflow Handling:** `overflow-visible` added to prevent gradient clipping
+- ✅ **Design Token Compliance:** All colors use CSS variables from `app/globals.css` (no hardcoded hex values found)
+- ✅ **ShadCN Integration:** Core components (Button, Card, Label, Progress) properly import from `@/components/ui`
+- ✅ **Responsive Design:** Mobile-first layout works across all tested viewports (375px, 768px, 1440px)
+- ✅ **Clean Console:** No JavaScript errors detected (only HMR development warnings)
+- ✅ **Network Performance:** All requests return 200 status codes, no failed requests
+- ✅ **Typography:** Inter font properly configured with Geist fallbacks
+- ✅ **Theme Support:** Dark mode tokens properly defined in `.dark` selector
+- ✅ **Accessibility Basics:** ARIA labels present on form inputs, semantic HTML structure
 
 ---
 
 ## High-Priority Fixes
 
-### 1. ✅ Gradient Header Color → FIXED
+### 1. [ ] Replace Custom Textarea with ShadCN Input Component
 
-**Status:** Complete
+**Issue:** The main idea input uses a custom `<textarea>` with Tailwind classes instead of leveraging ShadCN's Input component or a proper Textarea primitive.
 
-**Implementation:**
-- Header gradient: `from-[#6B46C1] to-[#9F7AEA]` ✅
-- Logo background: `from-[#6B46C1] to-[#9F7AEA]` ✅
-- All PrimaryCTA buttons: Updated to spec purple ✅
+**Impact:** Inconsistent styling, potential accessibility gaps, harder to maintain.
 
-**Code Verified:**
+**Fix:**
+
 ```tsx
-// app/page.tsx line 567
-<h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#6B46C1] to-[#9F7AEA] bg-clip-text text-transparent tracking-tight inline-block">
-  Coding Kickstarter
-</h1>
-```
+// Current (app/page.tsx line 657)
+<textarea
+  id="idea"
+  value={idea}
+  onChange={(e) => setIdea(e.target.value)}
+  className="flex min-h-[100px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 resize-none md:text-sm"
+  rows={4}
+/>
 
----
+// Recommended: Create a ShadCN-compatible Textarea component or use Input with textarea variant
+// Option 1: Add to components/ui/textarea.tsx
+import * as React from "react"
+import { cn } from "@/lib/utils"
 
-### 2. ✅ Gradient Text Clipping → FIXED (Including Descender "g")
+export interface TextareaProps
+  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
 
-**Status:** Complete
+const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
+  ({ className, ...props }, ref) => {
+    return (
+      <textarea
+        className={cn(
+          "flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
+          className
+        )}
+        ref={ref}
+        {...props}
+      />
+    )
+  }
+)
+Textarea.displayName = "Textarea"
 
-**Fix Applied:**
-- Wrapped h1 in padded container (`px-4 py-3 pb-5`) with extra bottom padding for descenders
-- Added `overflow-visible` to header element
-- Changed h1 to `inline-block` for proper padding behavior
-- Changed `leading-tight` to `leading-normal` to accommodate descenders
-- Moved `mb-6` margin to wrapper div
+export { Textarea }
 
-**Code Verified:**
-```tsx
-// app/page.tsx lines 566-570
-<div className="px-4 py-3 pb-5 mb-6 overflow-visible">
-  <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#6B46C1] to-[#9F7AEA] bg-clip-text text-transparent tracking-tight inline-block leading-normal">
-    Coding Kickstarter
-  </h1>
-</div>
-```
+// Then use in app/page.tsx:
+import { Textarea } from '@/components/ui/textarea';
 
----
-
-### 3. ✅ Inter Font Application → FIXED
-
-**Status:** Complete
-
-**Implementation:**
-- Updated `app/layout.tsx` to use `inter.className` instead of CSS variables
-- Font properly imported from `next/font/google`
-- Applied directly to body element
-
-**Code Verified:**
-```tsx
-// app/layout.tsx line 59
-<body className={`${inter.className} antialiased`}>
-```
-
----
-
-### 4. ✅ Dark Mode Toggle → IMPLEMENTED
-
-**Status:** Complete
-
-**Implementation:**
-- Created `components/ThemeProvider.tsx` with next-themes integration
-- Created `components/ThemeToggle.tsx` with Sun/Moon icons
-- Position: Fixed top-right (`fixed top-4 right-4 z-50`)
-- Integrated ThemeProvider in layout with system theme detection
-- Added ThemeToggle to homepage
-
-**Code Verified:**
-```tsx
-// components/ThemeToggle.tsx
-<Button
-  variant="ghost"
-  size="icon"
-  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-  className="fixed top-4 right-4 z-50 hover:bg-accent"
-  aria-label="Toggle theme"
->
-```
-
----
-
-### 5. ✅ Mobile Button Wrapper → FIXED
-
-**Status:** Complete
-
-**Implementation:**
-- Added explicit `w-full` to button container
-- Ensures proper full-width stacking on mobile
-- PDFDownload and Save Sprint buttons both have `w-full sm:w-auto`
-
-**Code Verified:**
-```tsx
-// app/page.tsx line 1056
-<div className="flex flex-col sm:flex-row gap-4 w-full justify-center items-center">
-  <PDFDownload ... className="w-full sm:w-auto" />
-  <Button ... className="w-full sm:w-auto">Save Sprint</Button>
-</div>
-```
-
----
-
-## Medium-Priority Items
-
-### 6. ✅ CSP Configuration → VERIFIED (No Changes Needed)
-
-**Status:** Complete
-
-**Verification:**
-- `next.config.ts` line 23 includes `data:` in `connect-src`
-- CSP allows PDF generation via data URIs
-- No changes required
-
----
-
-### 7. ✅ Code Block Styling → VERIFIED
-
-**Status:** Complete
-
-**Verification:**
-- `components/TaskList.tsx` line 81 matches spec exactly:
-  - Background: `bg-gray-100` ✅ (light gray)
-  - Padding: `p-4` ✅ (32px)
-  - Border radius: `rounded-md` ✅ (6px)
-  - Font: `font-mono` ✅ (monospace)
-
-**Code Verified:**
-```tsx
-// components/TaskList.tsx line 81
-<pre className="text-sm font-mono bg-gray-100 dark:bg-gray-800 text-foreground p-4 rounded-md overflow-x-auto border border-border">
-```
-
----
-
-### 8. ✅ Button CTA Colors → FIXED
-
-**Status:** Complete
-
-**Implementation:**
-- Updated all PrimaryCTA buttons from gradients to solid purple per spec
-- Changed: `bg-gradient-to-r from-[#6B46C1] to-[#9F7AEA]` → `bg-purple-600 hover:bg-purple-700`
-- Applied to all button states: idle, answering, finish-ready, checking, ready-generating, default
-- Retry button keeps red/orange gradient (intentional for error state)
-
-**Code Verified:**
-```tsx
-// components/PrimaryCTA.tsx - all states now use:
-className: 'flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-6 rounded-xl ...'
-```
-
----
-
-## Low-Priority Items
-
-### 9. ✅ Accessibility: ARIA Labels → FIXED
-
-**Status:** Complete
-
-**Implementation:**
-- Questions region: Added `aria-live="polite"` ✅
-- Results/Steps region: Added `role="region" aria-label="Setup Steps" aria-live="polite"` ✅
-- ProgressBar: Enhanced with `aria-valuenow`, `aria-valuemin`, `aria-valuemax`, `role="progressbar"` ✅
-- ThemeToggle: Already has `aria-label="Toggle theme"` ✅
-- Input fields: Already have proper labels ✅
-
-**Code Verified:**
-```tsx
-// app/page.tsx line 645
-<div className="mt-6 space-y-2 animate-fade-in" role="region" aria-label="Questionnaire" aria-live="polite">
-
-// app/page.tsx line 961
-<div className="space-y-8 animate-fade-in" role="region" aria-label="Setup Steps" aria-live="polite">
-
-// components/ProgressBar.tsx line 29
-<Progress 
-  aria-label={`Questionnaire Progress`}
-  aria-valuenow={Math.round(progress)}
-  aria-valuemin={0}
-  aria-valuemax={100}
-  role="progressbar"
+<Textarea
+  id="idea"
+  value={idea}
+  onChange={(e) => setIdea(e.target.value)}
+  placeholder="e.g., Todo app with login"
+  rows={4}
+  className="min-h-[100px] resize-none"
+  disabled={loading || loadingQuestions}
+  aria-describedby="idea-description"
+  aria-required="true"
 />
 ```
 
+### 2. [ ] Replace Custom Select with ShadCN Select Component
+
+**Issue:** Question select dropdowns use native `<select>` with custom Tailwind classes instead of ShadCN Select component.
+
+**Impact:** Inconsistent styling, limited customization, accessibility concerns.
+
+**Fix:**
+
+```tsx
+// Add ShadCN Select component (if not exists)
+// components/ui/select.tsx (standard ShadCN select)
+
+// Then replace in app/page.tsx line 722:
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
+{questionSet[questionIndex].type === 'select' && questionSet[questionIndex].options ? (
+  <Select
+    value={currentAnswer}
+    onValueChange={(value) => {
+      setCurrentAnswer(value);
+      if (validationErrors[questionSet[questionIndex].id]) {
+        const newErrors = { ...validationErrors };
+        delete newErrors[questionSet[questionIndex].id];
+        setValidationErrors(newErrors);
+        setError('');
+      }
+    }}
+    disabled={loading || loadingQuestions}
+  >
+    <SelectTrigger
+      id={`question-${questionSet[questionIndex].id}`}
+      aria-label={questionSet[questionIndex].text}
+      aria-required="true"
+      aria-invalid={!!validationErrors[questionSet[questionIndex].id]}
+    >
+      <SelectValue placeholder="Choose..." />
+    </SelectTrigger>
+    <SelectContent>
+      {questionSet[questionIndex].options!.map((opt) => (
+        <SelectItem key={opt} value={opt}>
+          {opt}
+        </SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
+) : (
+  // ... Input component
+)}
+```
+
+### 3. [ ] Enhance Button Disabled State Visibility
+
+**Issue:** The "Start Questionnaire" button appears disabled even when input has text. This may be a validation logic issue or visual feedback problem.
+
+**Impact:** User confusion, potential UX friction.
+
+**Fix:**
+
+```tsx
+// Ensure button state logic is clear and visual feedback is obvious
+// In PrimaryCTA.tsx, ensure disabled state uses proper opacity/visual cues:
+
+<Button
+  type={state === 'idle' ? 'submit' : 'button'}
+  variant="default"
+  disabled={buttonProps.disabled}
+  onClick={buttonProps.onClick}
+  className={cn(
+    'w-full sm:w-auto',
+    buttonProps.className,
+    // Add clear disabled state styling
+    buttonProps.disabled && 'opacity-50 cursor-not-allowed'
+  )}
+  aria-disabled={buttonProps.disabled}
+>
+  {buttonProps.showSpinner ? (
+    // ... spinner
+  ) : (
+    buttonProps.label
+  )}
+</Button>
+
+// Also verify validation logic in app/page.tsx:
+// The button should enable when idea.trim().length > 0
+```
+
 ---
 
-### 10. [ ] Contrast Ratio Verification → VERIFY WITH TOOLS
+## Medium-Priority Fixes
 
-**Issue:** Need to verify WCAG AA compliance (4.5:1 minimum)
+### 1. [ ] Add Focus Visible States for Better Keyboard Navigation
 
-**Recommendation:** Use browser dev tools or axe-core during live testing to verify:
-- Purple gradient text on white background
-- Gray placeholder text
-- Button text on gradient backgrounds
-- Footer text
+**Issue:** While focus states exist, they could be more prominent for keyboard users.
+
+**Fix:**
+
+```tsx
+// Enhance focus-visible states across interactive elements
+// Add to app/globals.css or component classes:
+
+.focus-visible-ring-enhanced {
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+}
+
+// Apply to buttons, inputs, selects:
+className="... focus-visible-ring-enhanced"
+```
+
+### 2. [ ] Improve Loading State Accessibility
+
+**Issue:** Loading spinner uses `aria-hidden="true"` which hides it from screen readers.
+
+**Fix:**
+
+```tsx
+// app/page.tsx line 685
+<div className="mt-6 text-center py-4 animate-fade-in" role="status" aria-live="polite" aria-busy="true">
+  <div className="flex items-center justify-center gap-2 text-primary">
+    <svg 
+      className="animate-spin h-5 w-5" 
+      xmlns="http://www.w3.org/2000/svg" 
+      fill="none" 
+      viewBox="0 0 24 24"
+      aria-hidden="false"
+      role="img"
+      aria-label="Loading"
+    >
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+    <span className="font-semibold" aria-live="polite">Generating questions...</span>
+  </div>
+</div>
+```
+
+### 3. [ ] Standardize Error Message Styling
+
+**Issue:** Error messages use hardcoded red colors instead of theme tokens.
+
+**Fix:**
+
+```tsx
+// app/page.tsx line 994
+// Replace hardcoded red colors with theme tokens:
+
+<div className="bg-destructive/10 border-2 border-destructive/30 text-destructive-foreground px-6 py-4 rounded-xl mb-8 animate-fade-in shadow-md">
+  <p className="font-bold flex items-center gap-2 mb-1">
+    <span>⚠️</span>
+    <span>Oops!</span>
+  </p>
+  <p className="text-destructive mb-3">{error}</p>
+  {/* ... rest of error display */}
+</div>
+
+// Also update validation error display (line 792):
+<div 
+  id={`error-${questionSet[questionIndex].id}`} 
+  className="mt-2 text-sm text-destructive flex items-center gap-1" 
+  role="alert"
+>
+  <span aria-hidden="true">⚠️</span>
+  <span>{validationErrors[questionSet[questionIndex].id]}</span>
+</div>
+```
+
+---
+
+## Low-Priority Fixes
+
+### 1. [ ] Add Skip Link for Keyboard Navigation
+
+**Issue:** No visible skip link for keyboard users to jump to main content.
+
+**Fix:**
+
+```tsx
+// Add to app/page.tsx after <body> tag:
+<a 
+  href="#main-content" 
+  className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md"
+>
+  Skip to main content
+</a>
+```
+
+### 2. [ ] Enhance Mobile Touch Targets
+
+**Issue:** Some interactive elements may be below the recommended 44x44px touch target size on mobile.
+
+**Fix:**
+
+```tsx
+// Ensure all buttons meet minimum touch target size:
+// Add to button variants or individual buttons:
+
+className="min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0"
+```
+
+### 3. [ ] Add Loading Skeleton States
+
+**Issue:** No skeleton loaders during question generation, which could improve perceived performance.
+
+**Fix:**
+
+```tsx
+// Create a skeleton component or use ShadCN Skeleton:
+import { Skeleton } from "@/components/ui/skeleton"
+
+{loadingQuestions && (
+  <div className="space-y-4 animate-fade-in">
+    <Skeleton className="h-4 w-3/4" />
+    <Skeleton className="h-10 w-full" />
+    <Skeleton className="h-4 w-1/2" />
+  </div>
+)}
+```
 
 ---
 
 ## Notes
 
-- **Build Status:** ✅ TypeScript compilation successful, no errors
-- **Dependencies:** ✅ next-themes installed and configured correctly
-- **Code Quality:** ✅ Consistent gradient colors throughout, proper overflow handling
-- **Dark Mode:** ✅ Fully functional with system preference detection
-- **Mobile Layout:** ✅ Responsive breakpoints properly implemented
+### Design Token Compliance ✅
+- All colors properly use CSS variables (`bg-primary`, `text-foreground`, `border-border`, etc.)
+- Gradient variables (`--gradient-from`, `--gradient-to`) properly defined
+- Dark mode tokens correctly implemented
+- No hardcoded hex colors found in components (except PDF component per spec)
+
+### ShadCN Component Usage ✅
+- **Button:** ✅ Properly imported and used
+- **Card:** ✅ Properly imported and used
+- **Label:** ✅ Properly imported and used
+- **Progress:** ✅ Properly imported and used
+- **Input:** ⚠️ Not used for textarea (custom implementation)
+- **Select:** ⚠️ Not used (native select with custom styling)
+
+### Accessibility Observations
+- ✅ Semantic HTML structure (nav, section, form, footer)
+- ✅ ARIA labels on form inputs
+- ✅ ARIA-describedby for form descriptions
+- ✅ Role attributes on dynamic content
+- ⚠️ Loading spinner marked as aria-hidden (should be visible to screen readers)
+- ⚠️ No skip link for keyboard navigation
+- ⚠️ Focus states could be more prominent
+
+### Performance Metrics
+- **Initial Load:** All resources loaded successfully (200 status codes)
+- **Network Requests:** No failed requests detected
+- **Console Errors:** None (only HMR development warnings)
+- **Font Loading:** Inter and Geist fonts properly loaded with `display: swap`
+
+### Browser Compatibility
+- Tested on Chromium-based browser (Playwright default)
+- CSS variables properly supported
+- Modern JavaScript features used (should work in all modern browsers)
+
+### PDF Component Verification ✅
+- PDF header gradient uses special-case colors (`#3b82f6` to `#8b5cf6`) as per spec
+- This is intentional and should not be changed
+- PDF component uses `@react-pdf/renderer` which doesn't support CSS variables
+
+### Responsive Design ✅
+- Mobile-first approach evident in Tailwind classes (`sm:`, `md:` breakpoints)
+- Layout adapts properly across tested viewports
+- Typography scales appropriately (`text-base sm:text-lg`)
 
 ---
 
-## Performance Metrics
+## Recommendations
 
-- **Build Time:** ~8-9 seconds (acceptable)
-- **TypeScript:** ✅ No type errors
-- **Bundle Size:** No significant increases detected
-
----
-
-## Browser Compatibility
-
-- **Tested:** Code review only
-- **Recommendation:** Test on Chrome, Safari, Firefox, Edge for full compatibility
-- **Dark Mode:** Should work across all modern browsers (next-themes handles compatibility)
+1. **Create ShadCN Textarea Component:** Add a proper Textarea component to `components/ui/textarea.tsx` following ShadCN patterns
+2. **Add ShadCN Select Component:** If not already present, add Select component for dropdowns
+3. **Improve Form Validation UX:** Make button disabled states more obvious and add better visual feedback
+4. **Enhance Accessibility:** Add skip links, improve focus states, ensure all loading states are accessible
+5. **Consider Skeleton Loaders:** Add skeleton states for better perceived performance during async operations
 
 ---
 
 ## Next Steps
 
-1. **Immediate:** Deploy changes and run live Playwright verification
-2. **High Priority:** Visual verification of gradient rendering and spacing
-3. **Medium Priority:** Test dark mode toggle functionality across browsers
-4. **Ongoing:** Run accessibility audit with axe-core and fix any contrast issues
+1. Apply high-priority fixes (Textarea, Select components)
+2. Test form submission flow end-to-end
+3. Verify PDF download functionality on mobile
+4. Run accessibility audit with axe-core or similar tool
+5. Re-run UI review after fixes are applied
 
 ---
 
-## Verification Checklist
-
-- [x] Gradient colors match spec (#6B46C1 → #9F7AEA)
-- [x] Inter font applied to body
-- [x] Dark mode toggle implemented
-- [x] Mobile button wrapper fixed
-- [x] Heading spacing fixed (no clipping, descender "g" fixed)
-- [x] Button CTAs updated to solid purple per spec
-- [x] Code blocks verified to match spec (bg-gray-100 p-4 rounded-md font-mono)
-- [x] ARIA labels added for accessibility
-- [x] ProgressBar enhanced with ARIA attributes
-- [x] Build verification successful
-- [ ] Live visual verification (requires deployment)
-- [ ] Playwright flow test (input → questions → steps → PDF)
-- [ ] Console error check (CSP, PDF generation)
-- [ ] Mobile viewport testing (375x667)
-- [ ] Dark mode visual verification
-- [ ] Contrast ratio verification (WCAG AA 4.5:1)
-
----
-
-**Report Generated:** Code Review + Manual Analysis  
-**Next Action:** Deploy and run live Playwright verification for final Grade A confirmation
+**Review Completed:** January 2025  
+**Specification Version:** `cursor_rules/UI Review Agent.md`  
+**Design Tokens Source:** `app/globals.css`

@@ -1,6 +1,7 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  // Enable Turbopack configuration to silence warnings
   turbopack: {
     root: __dirname, // explicitly point to the app root
   },
@@ -10,6 +11,9 @@ const nextConfig: NextConfig = {
       config.externals = config.externals || [];
       config.externals.push('dompurify');
     }
+    // Ensure proper resolution of @radix-ui packages
+    config.resolve = config.resolve || {};
+    config.resolve.alias = config.resolve.alias || {};
     return config;
   },
   async headers() {

@@ -19,7 +19,7 @@ export default function TaskList({ tasks }: TaskListProps) {
   const getPriorityColor = (priority: Task['priority']) => {
     switch (priority) {
       case 'High':
-        return 'bg-red-100 text-red-700 border-red-300 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800';
+        return 'bg-destructive/10 text-destructive border-destructive/30 dark:bg-destructive/20 dark:text-destructive dark:border-destructive/40';
       case 'Medium':
         return 'bg-yellow-100 text-yellow-700 border-yellow-300 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-800';
       case 'Low':
@@ -51,7 +51,7 @@ export default function TaskList({ tasks }: TaskListProps) {
                 <div className="flex-1 min-w-0">
                   {/* Title and Priority */}
                   <div className="flex items-start gap-3 mb-2 flex-wrap">
-                    <span className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-[#6B46C1] to-[#9F7AEA] text-white rounded-full flex items-center justify-center font-bold text-sm shadow-md group-hover:scale-110 transition-transform">
+                    <span className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-primary to-secondary text-primary-foreground rounded-full flex items-center justify-center font-bold text-sm group-hover:scale-110 transition-transform">
                       {task.number}
                     </span>
                     <div className="flex-1 min-w-0">
