@@ -12,6 +12,8 @@ import SkipBanner from '@/components/SkipBanner';
 import SkipWarning from '@/components/SkipWarning';
 import DraftBanner from '@/components/DraftBanner';
 import TaskList from '@/components/TaskList';
+import { HeroSection } from '@/components/HeroSection';
+import { BackgroundCanvas } from '@/components/BackgroundCanvas';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -566,7 +568,10 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col relative">
+      {/* Global Animated Background */}
+      <BackgroundCanvas />
+      
       {/* Navbar */}
       <nav className="w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -686,39 +691,10 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative w-full h-screen flex items-end overflow-hidden">
-        {/* Hero Content */}
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20 md:pb-24">
-          <div className="max-w-3xl">
-            <h1 className="text-3xl sm:text-4xl font-bold leading-tight mb-6 space-y-2">
-              <div className="headline-line-1">
-                <span className="bg-gradient-to-r from-primary to-chart-1 bg-clip-text text-transparent">
-                  NO SETUP PARALYSIS
-                </span>
-              </div>
-              <div className="headline-line-2">
-                <span className="bg-gradient-to-r from-primary to-chart-1 bg-clip-text text-transparent">
-                  JUST CODE!
-                </span>
-              </div>
-            </h1>
-            <div className="mt-6 sm:mt-8">
-              <Button 
-                size="lg" 
-                className="bg-primary hover:bg-primary/90 text-primary-foreground text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 h-auto rounded-xl"
-                onClick={() => {
-                  document.getElementById('main-content')?.scrollIntoView({ behavior: 'smooth' });
-                }}
-              >
-                Try it out
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
+      <HeroSection />
 
       {/* Main Content */}
-      <div id="main-content" className="max-w-4xl mx-auto w-full flex-1 p-4 sm:p-6">
+      <div id="main-content" className="max-w-4xl mx-auto w-full flex-1 p-4 sm:p-6 relative z-10">
         {/* Draft Banner */}
         {showDraftBanner && (
           <DraftBanner
@@ -1337,7 +1313,7 @@ export default function Home() {
       {/* Features Section */}
       <section 
         id="features" 
-        className="w-full py-20 sm:py-24 bg-background overflow-hidden"
+        className="relative z-10 w-full py-20 sm:py-24 bg-background/80 backdrop-blur-sm overflow-hidden"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -1429,7 +1405,7 @@ export default function Home() {
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="w-full py-20 sm:py-24 bg-muted/30">
+      <section id="how-it-works" className="relative z-10 w-full py-20 sm:py-24 bg-muted/20 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
@@ -1480,7 +1456,7 @@ export default function Home() {
       </section>
 
       {/* Examples Section */}
-      <section id="examples" className="w-full py-20 sm:py-24 bg-background">
+      <section id="examples" className="relative z-10 w-full py-20 sm:py-24 bg-background/80 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
@@ -1594,7 +1570,7 @@ export default function Home() {
       </section>
 
       {/* History Section */}
-      <section id="history" className="w-full py-20 sm:py-24 bg-muted/30">
+      <section id="history" className="relative z-10 w-full py-20 sm:py-24 bg-muted/20 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
@@ -1614,7 +1590,7 @@ export default function Home() {
 
       {/* Pricing Section */}
       {featureFlags.showPricing && (
-        <section id="pricing" className="w-full py-20 sm:py-24 bg-background">
+        <section id="pricing" className="relative z-10 w-full py-20 sm:py-24 bg-background/80 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
@@ -1756,7 +1732,7 @@ export default function Home() {
       )}
 
       {/* Footer - Always Visible */}
-      <footer className="text-center text-muted-foreground py-6 px-4 mt-auto border-t border-border/50 bg-background/50 backdrop-blur-sm">
+      <footer className="relative z-10 text-center text-muted-foreground py-6 px-4 mt-auto border-t border-border/50 bg-background/50 backdrop-blur-sm">
         <p className="text-sm">
           © Coding Kickstarter 2025
         </p>
