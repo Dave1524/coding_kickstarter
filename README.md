@@ -10,7 +10,7 @@ A webapp for beginner coders to kickstart their journey with AI-generated coding
 
 - **AI-Powered Setup Guides**: Generate beginner-friendly setup steps for any project idea
 - **Vibe Coding Mode**: Encourages creative, stress-free coding sessions
-- **Kanban Boards**: Visualize project structure and tasks
+- **MVP Output**: Get structured MVP blueprints with EPICs and Features
 - **PDF Export**: Download setup guides and plans
 - **Beginner-Friendly**: Simple, intuitive UI for new developers
 

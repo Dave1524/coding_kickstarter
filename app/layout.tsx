@@ -22,7 +22,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Coding Kickstarter - AI-Powered Setup Guides for Developers",
-  description: "Tell us your project idea and get a beginner-friendly setup guide powered by AI. Generate setup steps, kanban boards, and PDF guides instantly.",
+  description: "Tell us your project idea and get a beginner-friendly setup guide powered by AI. Generate setup steps, MVP blueprints with EPICs and Features, and PDF guides instantly.",
   keywords: ["coding", "setup guide", "AI", "developer tools", "beginner coding", "project setup"],
   openGraph: {
     title: "Coding Kickstarter - AI-Powered Setup Guides",

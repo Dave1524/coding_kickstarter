@@ -1,3 +1,4 @@
+@import "tailwind-animate";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -40,6 +41,53 @@ html {
 
 .animate-slide-in {
   animation: slideIn 0.4s ease-out;
+}
+
+/* Marquee animations */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes marquee-reverse {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-marquee {
+  animation: marquee linear infinite;
+}
+
+.animate-marquee-reverse {
+  animation: marquee-reverse linear infinite;
+}
+
+/* Custom staggered headline animations */
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.headline-line-1 {
+  animation: fadeSlideIn 1s ease-out 0.15s both;
+}
+
+.headline-line-2 {
+  animation: fadeSlideIn 1s ease-out 1s both;
 }
 
 @layer base {

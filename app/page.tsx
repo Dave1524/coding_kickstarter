@@ -17,6 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Marquee } from '@/components/ui/marquee';
 // Temporarily disabled Select import due to Turbopack module resolution issue
 // TODO: Re-enable once Turbopack resolves @radix-ui/react-select properly
 // import {
@@ -93,6 +94,7 @@ export default function Home() {
   const [savedId, setSavedId] = useState('');
   const [saveError, setSaveError] = useState('');
   const [earlyOpen, setEarlyOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currentAnswer, setCurrentAnswer] = useState('');
   const [skippedQuestions, setSkippedQuestions] = useState<Set<string>>(new Set());
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
@@ -101,7 +103,7 @@ export default function Home() {
   const [questionsAddedCount, setQuestionsAddedCount] = useState(0);
   const [showDraftBanner, setShowDraftBanner] = useState(false);
   const [errorDetailsExpanded, setErrorDetailsExpanded] = useState(false);
-  const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement | HTMLSelectElement | null>(null);
 
   // Auto-save draft
   useAutoSave(idea, answers, questionTexts, questionSet, questionIndex, skippedQuestions);
@@ -126,7 +128,9 @@ export default function Home() {
     if (draft && draft.idea) {
       setShowDraftBanner(true);
     }
-  }, []); // Only run on mount
+  }, []);
+
+
 
   // Handle draft resume
   const handleDraftResume = () => {
@@ -605,34 +609,98 @@ export default function Home() {
 
             {/* CTA Buttons - Right */}
             <div className="flex items-center gap-2 sm:gap-3">
-              <Button variant="ghost" size="sm" className="hidden sm:inline-flex" asChild>
-                <Link href="#login">Login</Link>
-              </Button>
-              <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs sm:text-sm rounded-xl" asChild>
-                <Link href="#join">Join up</Link>
+              <Button 
+                size="sm" 
+                className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs sm:text-sm rounded-xl"
+                onClick={() => setEarlyOpen(true)}
+              >
+                Join up
               </Button>
               <ThemeToggle />
+              
+              {/* Mobile Menu Button */}
+              <button
+                className="md:hidden p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                aria-label="Toggle menu"
+                aria-expanded={mobileMenuOpen}
+              >
+                {mobileMenuOpen ? (
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                ) : (
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                )}
+              </button>
             </div>
           </div>
+          
+          {/* Mobile Menu */}
+          {mobileMenuOpen && (
+            <div className="md:hidden border-t border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+              <div className="px-4 py-3 space-y-2">
+                <Link 
+                  href="#features" 
+                  className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Features
+                </Link>
+                <Link 
+                  href="#how-it-works" 
+                  className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  How It Works
+                </Link>
+                <Link 
+                  href="#examples" 
+                  className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Examples
+                </Link>
+                <Link 
+                  href="/history" 
+                  className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  History
+                </Link>
+                {featureFlags.showPricing && (
+                  <Link 
+                    href="#pricing" 
+                    className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Pricing
+                  </Link>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </nav>
 
       {/* Hero Section */}
       <section className="relative w-full h-screen flex items-end overflow-hidden">
-        {/* Unicorn.studio Background Element - Reserved for future interactive background */}
-        <div 
-          id="unicorn-studio-background" 
-          className="absolute inset-0 z-0"
-          aria-label="Interactive background element reserved for unicorn.studio integration"
-        />
-
         {/* Hero Content */}
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20 md:pb-24">
           <div className="max-w-3xl">
-            <h1 className="text-3xl sm:text-4xl font-bold leading-tight mb-6">
-              <span className="bg-gradient-to-r from-primary to-chart-1 bg-clip-text text-transparent">
-                NO SETUP PARALYSIS, JUST CODE!
-              </span>
+            <h1 className="text-3xl sm:text-4xl font-bold leading-tight mb-6 space-y-2">
+              <div className="headline-line-1">
+                <span className="bg-gradient-to-r from-primary to-chart-1 bg-clip-text text-transparent">
+                  NO SETUP PARALYSIS
+                </span>
+              </div>
+              <div className="headline-line-2">
+                <span className="bg-gradient-to-r from-primary to-chart-1 bg-clip-text text-transparent">
+                  JUST CODE!
+                </span>
+              </div>
             </h1>
             <div className="mt-6 sm:mt-8">
               <Button 
@@ -733,7 +801,7 @@ export default function Home() {
                 </Label>
                 {questionSet[questionIndex].type === 'select' && questionSet[questionIndex].options ? (
                   <select
-                    ref={(el) => { inputRef.current = el; }}
+                    ref={(el) => { inputRef.current = el as HTMLSelectElement | null; }}
                     id={`question-${questionSet[questionIndex].id}`}
                     className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
                     value={currentAnswer}
@@ -1267,7 +1335,10 @@ export default function Home() {
       </div>
 
       {/* Features Section */}
-      <section id="features" className="w-full py-20 sm:py-24 bg-background">
+      <section 
+        id="features" 
+        className="w-full py-20 sm:py-24 bg-background overflow-hidden"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
@@ -1279,8 +1350,11 @@ export default function Home() {
               Everything you need to kickstart your coding journey
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Card className="border-border hover:shadow-lg transition-shadow">
+        </div>
+        <div className="w-screen relative left-1/2 -translate-x-1/2 space-y-6">
+          {/* Row 1: Left to Right Marquee */}
+          <Marquee direction="left" duration={30} pauseOnHover className="[--gap:1.5rem]">
+            <Card className="border-border hover:shadow-lg transition-shadow shrink-0 w-[280px] md:w-[320px]">
               <CardHeader>
                 <div className="w-12 h-12 rounded-lg bg-primary flex items-center justify-center mb-4">
                   <span className="text-2xl">🤖</span>
@@ -1291,18 +1365,18 @@ export default function Home() {
                 </CardDescription>
               </CardHeader>
             </Card>
-            <Card className="border-border hover:shadow-lg transition-shadow">
+            <Card className="border-border hover:shadow-lg transition-shadow shrink-0 w-[280px] md:w-[320px]">
               <CardHeader>
                 <div className="w-12 h-12 rounded-lg bg-primary flex items-center justify-center mb-4">
                   <span className="text-2xl">📋</span>
                 </div>
-                <CardTitle>Kanban Boards</CardTitle>
+                <CardTitle>MVP Output</CardTitle>
                 <CardDescription>
-                  Visualize your project structure and tasks with interactive Kanban boards. Stay organized and focused.
+                  Get structured MVP blueprints with EPICs and Features. Organize your project roadmap and stay focused on what matters.
                 </CardDescription>
               </CardHeader>
             </Card>
-            <Card className="border-border hover:shadow-lg transition-shadow">
+            <Card className="border-border hover:shadow-lg transition-shadow shrink-0 w-[280px] md:w-[320px]">
               <CardHeader>
                 <div className="w-12 h-12 rounded-lg bg-primary flex items-center justify-center mb-4">
                   <span className="text-2xl">📄</span>
@@ -1313,7 +1387,11 @@ export default function Home() {
                 </CardDescription>
               </CardHeader>
             </Card>
-            <Card className="border-border hover:shadow-lg transition-shadow">
+          </Marquee>
+
+          {/* Row 2: Right to Left Marquee */}
+          <Marquee direction="right" duration={30} pauseOnHover className="[--gap:1.5rem]">
+            <Card className="border-border hover:shadow-lg transition-shadow shrink-0 w-[280px] md:w-[320px]">
               <CardHeader>
                 <div className="w-12 h-12 rounded-lg bg-primary flex items-center justify-center mb-4">
                   <span className="text-2xl">💡</span>
@@ -1324,7 +1402,7 @@ export default function Home() {
                 </CardDescription>
               </CardHeader>
             </Card>
-            <Card className="border-border hover:shadow-lg transition-shadow">
+            <Card className="border-border hover:shadow-lg transition-shadow shrink-0 w-[280px] md:w-[320px]">
               <CardHeader>
                 <div className="w-12 h-12 rounded-lg bg-primary flex items-center justify-center mb-4">
                   <span className="text-2xl">🎯</span>
@@ -1335,7 +1413,7 @@ export default function Home() {
                 </CardDescription>
               </CardHeader>
             </Card>
-            <Card className="border-border hover:shadow-lg transition-shadow">
+            <Card className="border-border hover:shadow-lg transition-shadow shrink-0 w-[280px] md:w-[320px]">
               <CardHeader>
                 <div className="w-12 h-12 rounded-lg bg-primary flex items-center justify-center mb-4">
                   <span className="text-2xl">💾</span>
@@ -1346,7 +1424,7 @@ export default function Home() {
                 </CardDescription>
               </CardHeader>
             </Card>
-          </div>
+          </Marquee>
         </div>
       </section>
 
