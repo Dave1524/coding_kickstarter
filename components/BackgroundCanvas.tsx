@@ -52,6 +52,7 @@ export function BackgroundCanvas() {
     window.addEventListener("resize", resizeCanvas);
 
     function draw() {
+      if (!ctx) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
       // Theme-aware colors with higher contrast
