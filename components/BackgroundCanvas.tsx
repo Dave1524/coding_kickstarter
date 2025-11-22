@@ -10,7 +10,7 @@ import { useTheme } from "next-themes";
  */
 export function BackgroundCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const tl = useRef<gsap.core.Timeline>();
+  const tl = useRef<gsap.core.Timeline | null>(null);
   const { theme, systemTheme } = useTheme();
   const currentTheme = theme === "system" ? systemTheme : theme || "light";
 
