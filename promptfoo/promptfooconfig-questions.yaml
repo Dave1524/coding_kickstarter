@@ -1,0 +1,153 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: Phase 1 - Question Generation Tests for Coding Kickstarter MVP
+
+# Test question generation only
+prompts:
+  - file://prompts/questions.yaml
+
+# Use the same model as production
+providers:
+  - id: openai:gpt-4o-mini
+    config:
+      temperature: 0.7
+      response_format: { type: 'json_object' }
+
+# Test question generation for different app ideas
+tests:
+  # Test 1: Todo app with login
+  - vars:
+      idea: A todo app with user login
+      testId: todo-app-login
+    assert:
+      - type: javascript
+        value: |
+          try {
+            const parsed = JSON.parse(output);
+            if (!parsed.questions || !Array.isArray(parsed.questions)) {
+              return false;
+            }
+            if (parsed.questions.length < 3 || parsed.questions.length > 4) {
+              return false;
+            }
+            // Validate each question structure
+            for (const q of parsed.questions) {
+              if (!q.id || !q.text || !q.type) {
+                return false;
+              }
+              if (q.type === 'select' && (!q.options || !Array.isArray(q.options))) {
+                return false;
+              }
+            }
+            return true;
+          } catch (e) {
+            return false;
+          }
+      - type: llm-rubric
+        value: Questions are relevant, clear, and help gather requirements for the app
+
+  # Test 2: Blog with comments
+  - vars:
+      idea: A blog where I write articles and readers can comment
+      testId: blog-comments
+    assert:
+      - type: javascript
+        value: |
+          try {
+            const parsed = JSON.parse(output);
+            return parsed.questions && Array.isArray(parsed.questions) && 
+                   parsed.questions.length >= 3 && parsed.questions.length <= 4;
+          } catch {
+            return false;
+          }
+      - type: llm-rubric
+        value: Questions are relevant, clear, and help gather requirements for the app
+
+  # Test 3: Weather dashboard
+  - vars:
+      idea: Weather dashboard for my city
+      testId: weather-dashboard
+    assert:
+      - type: javascript
+        value: |
+          try {
+            const parsed = JSON.parse(output);
+            return parsed.questions && Array.isArray(parsed.questions) && 
+                   parsed.questions.length >= 3 && parsed.questions.length <= 4;
+          } catch {
+            return false;
+          }
+      - type: llm-rubric
+        value: Questions are relevant, clear, and help gather requirements for the app
+
+  # Test 4: Habit tracker
+  - vars:
+      idea: Habit tracker to track my daily routines
+      testId: habit-tracker
+    assert:
+      - type: javascript
+        value: |
+          try {
+            const parsed = JSON.parse(output);
+            return parsed.questions && Array.isArray(parsed.questions) && 
+                   parsed.questions.length >= 3 && parsed.questions.length <= 4;
+          } catch {
+            return false;
+          }
+      - type: llm-rubric
+        value: Questions are relevant, clear, and help gather requirements for the app
+
+  # Test 5: Recipe sharing app
+  - vars:
+      idea: Recipe sharing app where users can post and rate recipes
+      testId: recipe-sharing
+    assert:
+      - type: javascript
+        value: |
+          try {
+            const parsed = JSON.parse(output);
+            return parsed.questions && Array.isArray(parsed.questions) && 
+                   parsed.questions.length >= 3 && parsed.questions.length <= 4;
+          } catch {
+            return false;
+          }
+      - type: llm-rubric
+        value: Questions are relevant, clear, and help gather requirements for the app
+
+  # Test 6: Simple landing page with form
+  - vars:
+      idea: Simple landing page with a contact form
+      testId: landing-page-form
+    assert:
+      - type: javascript
+        value: |
+          try {
+            const parsed = JSON.parse(output);
+            return parsed.questions && Array.isArray(parsed.questions) && 
+                   parsed.questions.length >= 3 && parsed.questions.length <= 4;
+          } catch {
+            return false;
+          }
+      - type: llm-rubric
+        value: Questions are relevant, clear, and help gather requirements for the app
+
+  # Test 7: SaaS dashboard with Stripe
+  - vars:
+      idea: SaaS dashboard with Stripe payments and user subscriptions
+      testId: saas-stripe
+    assert:
+      - type: javascript
+        value: |
+          try {
+            const parsed = JSON.parse(output);
+            return parsed.questions && Array.isArray(parsed.questions) && 
+                   parsed.questions.length >= 3 && parsed.questions.length <= 4;
+          } catch {
+            return false;
+          }
+      - type: llm-rubric
+        value: Questions are relevant, clear, and help gather requirements for the app
+
+# Output configuration
+output:
+  file: promptfoo-questions-output.json
+

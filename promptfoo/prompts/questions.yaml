@@ -1,0 +1,40 @@
+- role: system
+  content: |
+    You are an expert setup coach helping beginners build their first app.
+    Return ONLY valid JSON.
+- role: user
+  content: |
+    User's project idea: "{{idea}}"
+
+    Generate 3-4 clarifying questions that will help you create a detailed setup guide. Focus on:
+    - User's technical level and experience
+    - Key features and functionality needed
+    - Data storage requirements (if any)
+    - Authentication needs (if any)
+    - Deployment preferences
+    - UI/UX expectations
+
+    Return ONLY valid JSON in this exact format:
+    {
+      "questions": [
+        {
+          "id": "unique_id_1",
+          "text": "Question text here?",
+          "type": "text",
+          "placeholder": "Optional placeholder text"
+        },
+        {
+          "id": "unique_id_2",
+          "text": "Another question?",
+          "type": "select",
+          "options": ["Option 1", "Option 2", "Option 3"]
+        }
+      ]
+    }
+
+    Rules:
+    - Use "text" type for open-ended questions
+    - Use "select" type when specific options would be helpful
+    - Keep questions concise and beginner-friendly
+    - Generate exactly 3-4 questions total (not 5)
+    - Make questions specific to the project idea

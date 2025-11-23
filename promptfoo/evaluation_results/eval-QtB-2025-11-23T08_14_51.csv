@@ -1,0 +1,1146 @@
+idea,testId,"[openai:gpt-4o-mini] prompts\questions.yaml: [{""role"":""system"",""content"":""You are an expert setup coach helping beginners bui",Grader Reason,Comment,"[openai:gpt-4o-mini] prompts\setup-guide.yaml: [{""role"":""system"",""content"":""You are a Senior Setup Coach. Return ONLY JSON.\n""}",Grader Reason,Comment
+A todo app with user login,todo-app-login,"[PASS] {
+  ""questions"": [
+    {
+      ""id"": ""question_1"",
+      ""text"": ""What is your technical experience with building apps or coding?"",
+      ""type"": ""text"",
+      ""placeholder"": ""e.g., beginner, intermediate, advanced""
+    },
+    {
+      ""id"": ""question_2"",
+      ""text"": ""What key features do you want in your todo app (e.g., due dates, categories, reminders)?"",
+      ""type"": ""text"",
+      ""placeholder"": ""List the features you want""
+    },
+    {
+      ""id"": ""question_3"",
+      ""text"": ""How do you prefer to store your app data (e.g., local storage, cloud database)?"",
+      ""type"": ""select"",
+      ""options"": [""Local storage"", ""Firebase"", ""MongoDB"", ""MySQL""]
+    },
+    {
+      ""id"": ""question_4"",
+      ""text"": ""What kind of user authentication do you require (e.g., email/password, social login)?"",
+      ""type"": ""select"",
+      ""options"": [""Email/Password"", ""Social Login"", ""No authentication""]
+    }
+  ]
+}",All assertions passed,,"[FAIL] {
+  ""top5"": [
+    {
+      ""title"": ""Initialize Your Project"",
+      ""cursorPrompt"": ""npx create-next-app@latest my-todo-app"",
+      ""command"": ""npx create-next-app@latest my-todo-app"",
+      ""supabaseTip"": ""Creates a new Next.js project named 'my-todo-app' which is essential for building the frontend of your todo application.""
+    },
+    {
+      ""title"": ""Set Up Supabase Project"",
+      ""cursorPrompt"": ""supabase init"",
+      ""command"": ""supabase init"",
+      ""supabaseTip"": ""Initializes a new Supabase project in your local environment, allowing you to connect your application to a database and authentication.""
+    },
+    {
+      ""title"": ""Create Database Tables for Tasks"",
+      ""cursorPrompt"": ""supabase db create-table tasks"",
+      ""command"": ""supabase db create-table tasks"",
+      ""supabaseTip"": ""Creates a database table named 'tasks' to store todo items, which is essential for managing user tasks.""
+    },
+    {
+      ""title"": ""Configure User Authentication"",
+      ""cursorPrompt"": ""supabase auth signup"",
+      ""command"": ""supabase auth signup"",
+      ""supabaseTip"": ""Sets up user authentication to allow users to log in and manage their personal todo list securely.""
+    },
+    {
+      ""title"": ""Deploy Your Application"",
+      ""cursorPrompt"": ""vercel deploy"",
+      ""command"": ""vercel deploy"",
+      ""supabaseTip"": ""Deploys your application to Vercel, making it accessible on the web for users to interact with their todo list.""
+    }
+  ],
+  ""kanbanMarkdown"": ""| To Do | In Progress | Done |\n|---|---|---|\n| Set up database authentication | Deploy app to Vercel | Create user login page |"",
+  ""blueprint"": {
+    ""epics"": {
+      ""input"": [""User registration"", ""Task input form""],
+      ""output"": [""Display tasks"", ""User profile view""],
+      ""export"": [""Share tasks via link""],
+      ""history"": [""Task completion log"", ""User activity tracking""]
+    }
+  },
+  ""pdfMeta"": {
+    ""appName"": ""Todo App with User Login"",
+    ""gradient"": [""#3b82f6"", ""#8b5cf6""],
+    ""timestamp"": ""2023-10-06T12:00:00Z""
+  }
+}","The output does not contain any questions at all; it gives steps and metadata for setting up a todo app with Supabase and Vercel, but does not ask questions to clarify app requirements.",
+A blog where I write articles and readers can comment,blog-comments,"[PASS] {
+  ""questions"": [
+    {
+      ""id"": ""unique_id_1"",
+      ""text"": ""What is your technical experience level (e.g., beginner, intermediate, advanced)?"",
+      ""type"": ""text"",
+      ""placeholder"": ""Describe your experience level""
+    },
+    {
+      ""id"": ""unique_id_2"",
+      ""text"": ""What key features do you want in your blog (e.g., categories, tags, search functionality)?"",
+      ""type"": ""text"",
+      ""placeholder"": ""List your desired features""
+    },
+    {
+      ""id"": ""unique_id_3"",
+      ""text"": ""Do you want users to register or log in to comment on your blog?"",
+      ""type"": ""select"",
+      ""options"": [""Yes"", ""No""]
+    },
+    {
+      ""id"": ""unique_id_4"",
+      ""text"": ""How do you plan to host and deploy your blog (e.g., shared hosting, cloud services)?"",
+      ""type"": ""text"",
+      ""placeholder"": ""Explain your deployment preferences""
+    }
+  ]
+}",All assertions passed,,"[FAIL] {
+  ""top5"": [
+    {
+      ""title"": ""Initialize Your Blog Project"",
+      ""cursorPrompt"": ""npx create-next-app@latest my-blog"",
+      ""command"": ""npx create-next-app@latest my-blog"",
+      ""supabaseTip"": ""Creates a new Next.js project named 'my-blog', setting the stage for your blog development.""
+    },
+    {
+      ""title"": ""Set Up a Supabase Project"",
+      ""cursorPrompt"": ""supabase init my-blog"",
+      ""command"": ""supabase init my-blog"",
+      ""supabaseTip"": ""Initializes a new Supabase project in your app, enabling backend services like database and authentication.""
+    },
+    {
+      ""title"": ""Configure Database for Blog Posts"",
+      ""cursorPrompt"": ""supabase db push"",
+      ""command"": ""supabase db push"",
+      ""supabaseTip"": ""Pushes your local database schema to the Supabase backend, making your tables available to store blog posts.""
+    },
+    {
+      ""title"": ""Integrate Authentication for User Comments"",
+      ""cursorPrompt"": ""supabase auth signup"",
+      ""command"": ""supabase auth signup"",
+      ""supabaseTip"": ""Sets up basic authentication for your application allowing users to sign up and leave comments on blog posts.""
+    },
+    {
+      ""title"": ""Deploy Your Blog Online"",
+      ""cursorPrompt"": ""vercel deploy"",
+      ""command"": ""vercel deploy"",
+      ""supabaseTip"": ""Deploys your Next.js app to Vercel, making your blog accessible on the web for readers.""
+    }
+  ],
+  ""kanbanMarkdown"": ""| To Do | In Progress | Done |\n|---|---|---|\n| Write first blog article | Set up comment section | Blog deployed and live |"",
+  ""blueprint"": {
+    ""epics"": {
+      ""input"": [""User inputs blog content"", ""User signs up for comments""],
+      ""output"": [""Display blog articles"", ""Show comments under blog posts""],
+      ""export"": [""Export blog articles for sharing""],
+      ""history"": [""Track user comments"", ""Log changes to blog content""]
+    }
+  },
+  ""pdfMeta"": {
+    ""appName"": ""My Blog"",
+    ""gradient"": [""#3b82f6"", ""#8b5cf6""],
+    ""timestamp"": ""2023-10-01T12:00:00Z""
+  }
+}","The output does not contain any questions; it only provides steps, kanban board information, and metadata about the blog app. Therefore, there are no questions to assess for relevance, clarity, or requirements gathering.",
+Weather dashboard for my city,weather-dashboard,"[PASS] {
+  ""questions"": [
+    {
+      ""id"": ""q1"",
+      ""text"": ""What is your current level of programming experience?"",
+      ""type"": ""select"",
+      ""options"": [""Beginner"", ""Intermediate"", ""Advanced""]
+    },
+    {
+      ""id"": ""q2"",
+      ""text"": ""What key features do you want in your weather dashboard (e.g., current temperature, forecasts, alerts)?"",
+      ""type"": ""text"",
+      ""placeholder"": ""List features you'd like to see""
+    },
+    {
+      ""id"": ""q3"",
+      ""text"": ""Will you need users to sign up or log in to access the dashboard?"",
+      ""type"": ""select"",
+      ""options"": [""Yes"", ""No""]
+    },
+    {
+      ""id"": ""q4"",
+      ""text"": ""What is your preferred way to deploy your app (e.g., Heroku, Vercel, AWS)?"",
+      ""type"": ""text"",
+      ""placeholder"": ""Enter your preferred deployment platform""
+    }
+  ]
+}",All assertions passed,,"[FAIL] {
+  ""top5"": [
+    {
+      ""title"": ""Initialize Your Weather Dashboard Project"",
+      ""cursorPrompt"": ""npx create-next-app@latest my-weather-dashboard"",
+      ""command"": ""npx create-next-app@latest my-weather-dashboard"",
+      ""supabaseTip"": ""Creates a new Next.js project for your weather dashboard, setting up the necessary structure and files.""
+    },
+    {
+      ""title"": ""Set Up Environment Variables"",
+      ""cursorPrompt"": ""echo NEXT_PUBLIC_API_KEY=your_api_key_here > .env.local"",
+      ""command"": ""echo NEXT_PUBLIC_API_KEY=your_api_key_here > .env.local"",
+      ""supabaseTip"": ""This command creates a .env.local file to store your API key securely, ensuring your sensitive data is not exposed.""
+    },
+    {
+      ""title"": ""Integrate Weather API"",
+      ""cursorPrompt"": ""npm install axios"",
+      ""command"": ""npm install axios"",
+      ""supabaseTip"": ""Installs Axios, a promise-based HTTP client, to easily make requests to the weather API.""
+    },
+    {
+      ""title"": ""Set Up Supabase Database"",
+      ""cursorPrompt"": ""npx supabase init"",
+      ""command"": ""npx supabase init"",
+      ""supabaseTip"": ""Initializes a new Supabase project, setting up the database and authentication features for your dashboard.""
+    },
+    {
+      ""title"": ""Deploy Your Weather Dashboard"",
+      ""cursorPrompt"": ""npx vercel"",
+      ""command"": ""npx vercel"",
+      ""supabaseTip"": ""Deploys your Next.js application to Vercel, making your weather dashboard accessible online.""
+    }
+  ],
+  ""kanbanMarkdown"": ""| To Do | In Progress | Done |\n|---|---|---|\n| Initialize Project | Set Up Environment Variables | Deploy Dashboard |\n| Integrate Weather API | Set Up Supabase Database |  |"",
+  ""blueprint"": {
+    ""epics"": {
+      ""input"": [""Get user location"", ""Fetch weather data from API""],
+      ""output"": [""Display current weather"", ""Show weekly forecast""],
+      ""export"": [""Export weather data as CSV""],
+      ""history"": [""Store user search history""]
+    }
+  },
+  ""pdfMeta"": {
+    ""appName"": ""My Weather Dashboard"",
+    ""gradient"": [""#3b82f6"", ""#8b5cf6""],
+    ""timestamp"": ""2023-10-18T12:00:00Z""
+  }
+}","There are no questions included in the output. The output contains a set of setup steps, kanban board, blueprint of features, and metadata, but does not contain any questions to the user.",
+Habit tracker to track my daily routines,habit-tracker,"[PASS] {
+  ""questions"": [
+    {
+      ""id"": ""q1"",
+      ""text"": ""What is your current level of programming experience?"",
+      ""type"": ""select"",
+      ""options"": [""Beginner"", ""Intermediate"", ""Advanced""]
+    },
+    {
+      ""id"": ""q2"",
+      ""text"": ""What key features do you want in your habit tracker (e.g., reminders, stats, sharing)?"",
+      ""type"": ""text"",
+      ""placeholder"": ""List your desired features""
+    },
+    {
+      ""id"": ""q3"",
+      ""text"": ""Do you need user authentication for your app (e.g., login/signup)?"",
+      ""type"": ""select"",
+      ""options"": [""Yes"", ""No""]
+    },
+    {
+      ""id"": ""q4"",
+      ""text"": ""How would you like to store your habit data (e.g., local storage, cloud database)?"",
+      ""type"": ""text"",
+      ""placeholder"": ""Specify your preferred data storage method""
+    }
+  ]
+}",All assertions passed,,"[FAIL] {
+  ""top5"": [
+    {
+      ""title"": ""Initialize Your Project"",
+      ""cursorPrompt"": ""npx create-next-app@latest habit-tracker"",
+      ""command"": ""npx create-next-app@latest habit-tracker"",
+      ""supabaseTip"": ""Creates a new Next.js project named 'habit-tracker', providing a solid foundation to build your habit tracking application.""
+    },
+    {
+      ""title"": ""Set Up Database"",
+      ""cursorPrompt"": ""supabase start"",
+      ""command"": ""supabase start"",
+      ""supabaseTip"": ""Starts a local Supabase instance allowing you to manage your database for storing your habit tracking data.""
+    },
+    {
+      ""title"": ""Configure Authentication"",
+      ""cursorPrompt"": ""supabase auth signup {email} {password}"",
+      ""command"": ""supabase auth signup test@example.com TestPassword123!"",
+      ""supabaseTip"": ""Creates a new user in Supabase, enabling user sign-up functionality for your app.""
+    },
+    {
+      ""title"": ""Create Habit Table"",
+      ""cursorPrompt"": ""npx supabase migration create create_habits_table"",
+      ""command"": ""npx supabase migration create create_habits_table"",
+      ""supabaseTip"": ""Generates a migration script for defining your habits table schema in the database.""
+    },
+    {
+      ""title"": ""Deploy Your Application"",
+      ""cursorPrompt"": ""vercel deploy"",
+      ""command"": ""vercel deploy"",
+      ""supabaseTip"": ""Deploys your Next.js app to Vercel, making it accessible to users online.""
+    }
+  ],
+  ""kanbanMarkdown"": ""| To Do | In Progress | Done |\n|---|---|---|\n| Set up Supabase | Build habit tracking UI | Application deployed |"",
+  ""blueprint"": {
+    ""epics"": {
+      ""input"": [""User authentication setup"", ""Form to add habits""],
+      ""output"": [""Display habits list"", ""Track habit completion""],
+      ""export"": [""Export habits data as CSV""],
+      ""history"": [""Store user habit logs"", ""Review past habits""]
+    }
+  },
+  ""pdfMeta"": {
+    ""appName"": ""Habit Tracker"",
+    ""gradient"": [""#3b82f6"", ""#8b5cf6""],
+    ""timestamp"": ""2023-10-01T12:00:00Z""
+  }
+}","The output contains setup steps, blueprint structure, and some sample UI structure, but it does not contain any questions aimed at clarifying app requirements or gathering information from a user or stakeholder. Therefore, it does not pass the rubric.",
+Recipe sharing app where users can post and rate recipes,recipe-sharing,"[PASS] {
+  ""questions"": [
+    {
+      ""id"": ""q1"",
+      ""text"": ""What is your technical experience with app development or programming languages?"",
+      ""type"": ""text"",
+      ""placeholder"": ""e.g., None, beginner, intermediate""
+    },
+    {
+      ""id"": ""q2"",
+      ""text"": ""What key features do you want in your recipe sharing app? (e.g., search, comments, user profiles)"",
+      ""type"": ""text"",
+      ""placeholder"": ""List the features you want""
+    },
+    {
+      ""id"": ""q3"",
+      ""text"": ""How do you prefer to authenticate users? (e.g., email/password, social media logins)"",
+      ""type"": ""select"",
+      ""options"": [""Email and Password"", ""Google Login"", ""Facebook Login"", ""No Authentication""]
+    },
+    {
+      ""id"": ""q4"",
+      ""text"": ""What type of user interface experience are you envisioning for your app? (e.g., simple, minimalist, vibrant)"",
+      ""type"": ""text"",
+      ""placeholder"": ""Describe your UI/UX expectations""
+    }
+  ]
+}",All assertions passed,,"[FAIL] {
+  ""top5"": [
+    {
+      ""title"": ""Create Your Recipe Sharing Project"",
+      ""cursorPrompt"": ""npx create-next-app@latest recipe-sharing-app"",
+      ""command"": ""npx create-next-app@latest recipe-sharing-app"",
+      ""supabaseTip"": ""This command initializes a new Next.js application called 'recipe-sharing-app', providing a strong foundation for your app.""
+    },
+    {
+      ""title"": ""Install Supabase Client Library"",
+      ""cursorPrompt"": ""npm install @supabase/supabase-js"",
+      ""command"": ""npm install @supabase/supabase-js"",
+      ""supabaseTip"": ""This command installs the Supabase client for JavaScript, allowing your app to interact with Supabase services like authentication and database operations.""
+    },
+    {
+      ""title"": ""Set Up Supabase Database"",
+      ""cursorPrompt"": ""npx supabase init"",
+      ""command"": ""npx supabase init"",
+      ""supabaseTip"": ""This command initializes Supabase in your project, giving you tools to manage your backend services, including setting up a database.""
+    },
+    {
+      ""title"": ""Create Recipes Table in Database"",
+      ""cursorPrompt"": ""npx supabase migration create create_recipes_table"",
+      ""command"": ""npx supabase migration create create_recipes_table"",
+      ""supabaseTip"": ""This command creates a migration file to set up a table called 'recipes' in your Supabase database, where users can store their recipes.""
+    },
+    {
+      ""title"": ""Set Up Authentication for Users"",
+      ""cursorPrompt"": ""npx supabase auth signUp"",
+      ""command"": ""npx supabase auth signUp"",
+      ""supabaseTip"": ""This command allows you to set up user authentication, which is essential for users to log in and manage their recipe submissions.""
+    }
+  ],
+  ""kanbanMarkdown"": ""| To Do | In Progress | Done |\n|---|---|---|\n| Set up project structure | Create user interface | Publish app |"",
+  ""blueprint"": {
+    ""epics"": {
+      ""input"": [""User Sign Up and Login"", ""Recipe Submission Form"", ""Recipe Rating System""],
+      ""output"": [""Display Recipe List"", ""Show Individual Recipe Details""],
+      ""export"": [""Export Favorite Recipes to PDF""],
+      ""history"": [""Track User Activity and Recipe Submissions""]
+    }
+  },
+  ""pdfMeta"": {
+    ""appName"": ""Recipe Sharing App"",
+    ""gradient"": [""#3b82f6"", ""#8b5cf6""],
+    ""timestamp"": ""2023-10-18T12:00:00Z""
+  }
+}","There are no questions present in the output—it's primarily a list of commands, features, and metadata for the recipe sharing app. As such, the rubric requirement about questions being clear and relevant is not fulfilled.",
+Simple landing page with a contact form,landing-page-form,"[PASS] {
+  ""questions"": [
+    {
+      ""id"": ""q1"",
+      ""text"": ""What is your level of experience with web development?"",
+      ""type"": ""select"",
+      ""options"": [""Beginner"", ""Intermediate"", ""Advanced""]
+    },
+    {
+      ""id"": ""q2"",
+      ""text"": ""What specific fields do you want in your contact form (e.g., name, email, message)?"",
+      ""type"": ""text"",
+      ""placeholder"": ""List the fields you want""
+    },
+    {
+      ""id"": ""q3"",
+      ""text"": ""Do you need to store the contact form submissions somewhere (e.g., database, email notification)?"",
+      ""type"": ""select"",
+      ""options"": [""Yes, a database"", ""Yes, email"", ""No""]
+    },
+    {
+      ""id"": ""q4"",
+      ""text"": ""What type of deployment method do you prefer (e.g., hosting service, local server)?"",
+      ""type"": ""select"",
+      ""options"": [""GitHub Pages"", ""Netlify"", ""Heroku"", ""Local Server""]
+    }
+  ]
+}",All assertions passed,,"[FAIL] {
+  ""top5"": [
+    {
+      ""title"": ""Initialize Your Landing Page Project"",
+      ""cursorPrompt"": ""npx create-next-app my-landing-page"",
+      ""command"": ""npx create-next-app my-landing-page"",
+      ""supabaseTip"": ""Creates a new Next.js project named 'my-landing-page' to house your landing page application.""
+    },
+    {
+      ""title"": ""Install Tailwind CSS for Styling"",
+      ""cursorPrompt"": ""npm install -D tailwindcss postcss autoprefixer"",
+      ""command"": ""npm install -D tailwindcss postcss autoprefixer"",
+      ""supabaseTip"": ""This command installs Tailwind CSS along with PostCSS and Autoprefixer, enabling utility-first styling for your landing page.""
+    },
+    {
+      ""title"": ""Configure Tailwind CSS"",
+      ""cursorPrompt"": ""npx tailwindcss init -p"",
+      ""command"": ""npx tailwindcss init -p"",
+      ""supabaseTip"": ""Initializes Tailwind CSS configuration files (tailwind.config.js and postcss.config.js) needed to customize and use Tailwind CSS.""
+    },
+    {
+      ""title"": ""Set Up a Contact Form Component"",
+      ""cursorPrompt"": ""Create ContactForm.js in components directory"",
+      ""command"": ""touch components/ContactForm.js"",
+      ""supabaseTip"": ""Creates a new React component file for the contact form, organizing your code for ease of development and maintenance.""
+    },
+    {
+      ""title"": ""Deploy Your Landing Page"",
+      ""cursorPrompt"": ""vercel --prod"",
+      ""command"": ""vercel --prod"",
+      ""supabaseTip"": ""Deploys your completed landing page to Vercel, making it accessible online for users to contact you.""
+    }
+  ],
+  ""kanbanMarkdown"": ""| To Do | In Progress | Done |\n|---|---|---|\n| Initialize Project | Install Dependencies | Deploy Application |\n| Configure Tailwind CSS | Set Up Contact Form | |\n| Create Landing Page Layout |  | |"",
+  ""blueprint"": {
+    ""epics"": {
+      ""input"": [""Create Contact Form"", ""Add Input Validation""],
+      ""output"": [""Display Success Message""],
+      ""export"": [""Allow Form Submissions""],
+      ""history"": [""Log Submission Details""]
+    }
+  },
+  ""pdfMeta"": {
+    ""appName"": ""Landing Page Builder"",
+    ""gradient"": [""#3b82f6"", ""#8b5cf6""],
+    ""timestamp"": ""2023-10-06T12:00:00Z""
+  }
+}","The output consists of project setup steps, command usage, Kanban table, feature blueprint, and PDF metadata, but it does not present any questions for the user to help gather requirements. Therefore, no questions can be evaluated for relevance or clarity.",
+SaaS dashboard with Stripe payments and user subscriptions,saas-stripe,"[PASS] {
+  ""questions"": [
+    {
+      ""id"": ""q1"",
+      ""text"": ""What is your current technical skill level (e.g., beginner, intermediate, advanced)?"",
+      ""type"": ""select"",
+      ""options"": [""Beginner"", ""Intermediate"", ""Advanced""]
+    },
+    {
+      ""id"": ""q2"",
+      ""text"": ""What specific features do you want in your SaaS dashboard (e.g., user analytics, payment history)?"",
+      ""type"": ""text"",
+      ""placeholder"": ""List key features""
+    },
+    {
+      ""id"": ""q3"",
+      ""text"": ""What data storage solutions are you considering (e.g., SQL database, NoSQL, cloud storage)?"",
+      ""type"": ""text"",
+      ""placeholder"": ""Specify your storage preference""
+    },
+    {
+      ""id"": ""q4"",
+      ""text"": ""How do you envision the user authentication process (e.g., email/password, social login)?"",
+      ""type"": ""text"",
+      ""placeholder"": ""Describe your authentication needs""
+    }
+  ]
+}",All assertions passed,,"[FAIL] {
+  ""top5"": [
+    {
+      ""title"": ""Initialize Your Project"",
+      ""cursorPrompt"": ""npx create-next-app@latest your-saas-dashboard --typescript"",
+      ""command"": ""npx create-next-app@latest your-saas-dashboard --typescript"",
+      ""supabaseTip"": ""Creates a new Next.js project configured with TypeScript, allowing you to leverage modern JavaScript features and type safety.""
+    },
+    {
+      ""title"": ""Set Up Supabase for Backend"",
+      ""cursorPrompt"": ""npx supabase init"",
+      ""command"": ""npx supabase init"",
+      ""supabaseTip"": ""Initializes a new Supabase project, preparing it to handle your backend services like auth and database.""
+    },
+    {
+      ""title"": ""Connect Supabase to Your Project"",
+      ""cursorPrompt"": ""npm install @supabase/supabase-js"",
+      ""command"": ""npm install @supabase/supabase-js"",
+      ""supabaseTip"": ""Installs the Supabase JavaScript client, enabling you to interact with your Supabase backend from your frontend.""
+    },
+    {
+      ""title"": ""Integrate Stripe for Payments"",
+      ""cursorPrompt"": ""npm install stripe"",
+      ""command"": ""npm install stripe"",
+      ""supabaseTip"": ""Adds the Stripe library to your project, allowing you to handle payment processing and subscription management.""
+    },
+    {
+      ""title"": ""Set Up User Authentication"",
+      ""cursorPrompt"": ""npx supabase gen types typescript --schema public > supabase/types.ts"",
+      ""command"": ""npx supabase gen types typescript --schema public > supabase/types.ts"",
+      ""supabaseTip"": ""Generates TypeScript definitions for your Supabase schema, ensuring type safety when interacting with your database.""
+    }
+  ],
+  ""kanbanMarkdown"": ""| To Do | In Progress | Done |\n|---|---|---|\n| Initialize project | Connect Supabase | User authentication set up |\n| Integrate Stripe |  |  |\n| Setup database |  |  |"",
+  ""blueprint"": {
+    ""epics"": {
+      ""input"": [""User Registration"", ""Payment Setup""],
+      ""output"": [""Dashboard Analytics"", ""Subscription Statistics""],
+      ""export"": [""Export Reports""],
+      ""history"": [""User Activity Log""]
+    }
+  },
+  ""pdfMeta"": {
+    ""appName"": ""SaaS Dashboard"",
+    ""gradient"": [""#3b82f6"", ""#8b5cf6""],
+    ""timestamp"": ""2023-10-01T12:00:00Z""
+  }
+}","The output does not contain any questions. It lists steps, kanban board, blueprint structure, and metadata, but does not ask any questions relevant to gathering requirements.",
+A todo app with user login,todo-app-final,"[FAIL] {
+  ""questions"": [
+    {
+      ""id"": ""question_1"",
+      ""text"": ""What is your technical experience with building apps or coding?"",
+      ""type"": ""text"",
+      ""placeholder"": ""e.g., beginner, intermediate, advanced""
+    },
+    {
+      ""id"": ""question_2"",
+      ""text"": ""What key features do you want in your todo app (e.g., due dates, categories, reminders)?"",
+      ""type"": ""text"",
+      ""placeholder"": ""List the features you want""
+    },
+    {
+      ""id"": ""question_3"",
+      ""text"": ""How do you prefer to store your app data (e.g., local storage, cloud database)?"",
+      ""type"": ""select"",
+      ""options"": [""Local storage"", ""Firebase"", ""MongoDB"", ""MySQL""]
+    },
+    {
+      ""id"": ""question_4"",
+      ""text"": ""What kind of user authentication do you require (e.g., email/password, social login)?"",
+      ""type"": ""select"",
+      ""options"": [""Email/Password"", ""Social Login"", ""No authentication""]
+    }
+  ]
+}","Custom function threw error: Custom function must return a boolean, number, or GradingResult object. Got type string: ""Missing valid PDF metadata""
+Stack Trace: Error: Custom function must return a boolean, number, or GradingResult object. Got type string: ""Missing valid PDF metadata""
+    at validateResult (C:\Users\Sahana R Reddy\coding_kickstarter\node_modules\promptfoo\src\assertions\javascript.ts:11:11)
+    at handleJavascript (C:\Users\Sahana R Reddy\coding_kickstarter\node_modules\promptfoo\src\assertions\javascript.ts:61:16)
+    at runAssertion (C:\Users\Sahana R Reddy\coding_kickstarter\node_modules\promptfoo\src\assertions\index.ts:388:20)
+    at C:\Users\Sahana R Reddy\coding_kickstarter\node_modules\promptfoo\src\assertions\index.ts:479:22
+const parsed = JSON.parse(output);
+// Check that all required PDF data is present
+const hasPdfData = parsed.pdfMeta && 
+                  parsed.pdfMeta.appName && 
+                  parsed.pdfMeta.gradient && 
+                  Array.isArray(parsed.pdfMeta.gradient) &&
+                  parsed.pdfMeta.gradient.length === 2;
+if (!hasPdfData) {
+  return 'Missing valid PDF metadata';
+}
+return true;",,"[PASS] {
+  ""top5"": [
+    {
+      ""title"": ""Initialize Your Project"",
+      ""cursorPrompt"": ""npx create-next-app@latest todo-app --typescript"",
+      ""command"": ""npx create-next-app@latest todo-app --typescript"",
+      ""supabaseTip"": ""Creates a new Next.js project with TypeScript. This sets up the foundational structure for your application.""
+    },
+    {
+      ""title"": ""Set Up Database"",
+      ""cursorPrompt"": ""supabase init"",
+      ""command"": ""supabase init"",
+      ""supabaseTip"": ""Initializes Supabase for your project, creating the necessary configuration files to connect to the database.""
+    },
+    {
+      ""title"": ""Configure Authentication"",
+      ""cursorPrompt"": ""supabase auth signup email@example.com --password yourpassword"",
+      ""command"": ""supabase auth signup email@example.com --password yourpassword"",
+      ""supabaseTip"": ""Sets up user authentication, enabling user login with email and password. Essential for securing user accounts.""
+    },
+    {
+      ""title"": ""Create Todos Table"",
+      ""cursorPrompt"": ""supabase sql 'CREATE TABLE todos (id SERIAL PRIMARY KEY, title TEXT, completed BOOLEAN DEFAULT FALSE)'"",
+      ""command"": ""supabase sql 'CREATE TABLE todos (id SERIAL PRIMARY KEY, title TEXT, completed BOOLEAN DEFAULT FALSE)'"",
+      ""supabaseTip"": ""Creates a new table in the database for storing todos, allowing for data management related to user tasks.""
+    },
+    {
+      ""title"": ""Integrate Frontend with Supabase"",
+      ""cursorPrompt"": ""npm install @supabase/supabase-js"",
+      ""command"": ""npm install @supabase/supabase-js"",
+      ""supabaseTip"": ""Installs the Supabase JavaScript library to interact with your database from the frontend, necessary for CRUD operations.""
+    }
+  ],
+  ""kanbanMarkdown"": ""| To Do | In Progress | Done |\n|---|---|---|\n| Set up project structure | Integrate Supabase | Test login functionality |"",
+  ""blueprint"": {
+    ""epics"": {
+      ""input"": [""User login creation"", ""Todo input functionality""],
+      ""output"": [""Display todos to user"", ""Mark todos as complete""],
+      ""export"": [""Export todo list as CSV""],
+      ""history"": [""Track completed todos""]
+    }
+  },
+  ""pdfMeta"": {
+    ""appName"": ""Todo App with User Login"",
+    ""gradient"": [""#3b82f6"", ""#8b5cf6""],
+    ""timestamp"": ""2023-10-03T12:00:00Z""
+  }
+}",All assertions passed,
+Weather dashboard for my city,weather-final,"[FAIL] {
+  ""questions"": [
+    {
+      ""id"": ""q1"",
+      ""text"": ""What is your current level of programming experience?"",
+      ""type"": ""select"",
+      ""options"": [""Beginner"", ""Intermediate"", ""Advanced""]
+    },
+    {
+      ""id"": ""q2"",
+      ""text"": ""What key features do you want in your weather dashboard (e.g., current temperature, forecasts, alerts)?"",
+      ""type"": ""text"",
+      ""placeholder"": ""List features you'd like to see""
+    },
+    {
+      ""id"": ""q3"",
+      ""text"": ""Will you need users to sign up or log in to access the dashboard?"",
+      ""type"": ""select"",
+      ""options"": [""Yes"", ""No""]
+    },
+    {
+      ""id"": ""q4"",
+      ""text"": ""What is your preferred way to deploy your app (e.g., Heroku, Vercel, AWS)?"",
+      ""type"": ""text"",
+      ""placeholder"": ""Enter your preferred deployment platform""
+    }
+  ]
+}","Custom function threw error: Custom function must return a boolean, number, or GradingResult object. Got type undefined: undefined
+Stack Trace: Error: Custom function must return a boolean, number, or GradingResult object. Got type undefined: undefined
+    at validateResult (C:\Users\Sahana R Reddy\coding_kickstarter\node_modules\promptfoo\src\assertions\javascript.ts:11:11)
+    at handleJavascript (C:\Users\Sahana R Reddy\coding_kickstarter\node_modules\promptfoo\src\assertions\javascript.ts:61:16)
+    at runAssertion (C:\Users\Sahana R Reddy\coding_kickstarter\node_modules\promptfoo\src\assertions\index.ts:388:20)
+    at C:\Users\Sahana R Reddy\coding_kickstarter\node_modules\promptfoo\src\assertions\index.ts:479:22
+try {
+  const parsed = JSON.parse(output);
+  return parsed.top5 && Array.isArray(parsed.top5) && parsed.top5.length === 5;
+} catch {
+  return false;
+}",,"[PASS] {
+  ""top5"": [
+    {
+      ""title"": ""Set Up API Access"",
+      ""cursorPrompt"": ""OpenWeatherMap API key setup"",
+      ""command"": ""curl 'https://api.openweathermap.org/data/2.5/weather?q=YourCity&appid=YourAPIKey'"",
+      ""supabaseTip"": ""This command fetches the current weather data for your specified city using OpenWeatherMap's API. It's essential to retrieve real-time weather information for your dashboard.""
+    },
+    {
+      ""title"": ""Create Project Structure"",
+      ""cursorPrompt"": ""Create directory for your weather dashboard"",
+      ""command"": ""mkdir weather-dashboard && cd weather-dashboard"",
+      ""supabaseTip"": ""This command creates a new directory for your project and navigates into it. Organizing your project files in a dedicated folder is crucial for better management.""
+    },
+    {
+      ""title"": ""Initialize Frontend Framework"",
+      ""cursorPrompt"": ""Set up a React application with create-react-app"",
+      ""command"": ""npx create-react-app ."",
+      ""supabaseTip"": ""This command initializes a new React application in the current directory. React will help you build a user-friendly interface for your weather dashboard.""
+    },
+    {
+      ""title"": ""Install Axios for API Requests"",
+      ""cursorPrompt"": ""Install Axios to handle HTTP requests"",
+      ""command"": ""npm install axios"",
+      ""supabaseTip"": ""This command installs Axios, a promise-based HTTP client for the browser and Node.js. It's important for making API calls to fetch weather data.""
+    },
+    {
+      ""title"": ""Start Development Server"",
+      ""cursorPrompt"": ""Run your React app on a local server"",
+      ""command"": ""npm start"",
+      ""supabaseTip"": ""This command starts the development server, allowing you to view your weather dashboard in a web browser. It enables live reloading, making development efficient.""
+    }
+  ],
+  ""kanbanMarkdown"": ""| To Do | In Progress | Done |\n|---|---|---|\n| Set Up API Access | Initialize Frontend Framework | Start Development Server |\n| Create Project Structure | Install Axios for API Requests |  |"",
+  ""blueprint"": {
+    ""epics"": {
+      ""input"": [""Fetch current weather data"", ""Fetch 5-day forecast""],
+      ""output"": [""Display current temperature"", ""Show weather conditions""],
+      ""export"": [""Export data to CSV""],
+      ""history"": [""Log past weather data""]
+    }
+  },
+  ""pdfMeta"": {
+    ""appName"": ""Weather Dashboard for My City"",
+    ""gradient"": [""#3b82f6"", ""#8b5cf6""],
+    ""timestamp"": ""2023-10-01T10:00:00Z""
+  }
+}",All assertions passed,
+A blog where I write articles and readers can comment,blog-final,"[FAIL] {
+  ""questions"": [
+    {
+      ""id"": ""unique_id_1"",
+      ""text"": ""What is your technical experience level (e.g., beginner, intermediate, advanced)?"",
+      ""type"": ""text"",
+      ""placeholder"": ""Describe your experience level""
+    },
+    {
+      ""id"": ""unique_id_2"",
+      ""text"": ""What key features do you want in your blog (e.g., categories, tags, search functionality)?"",
+      ""type"": ""text"",
+      ""placeholder"": ""List your desired features""
+    },
+    {
+      ""id"": ""unique_id_3"",
+      ""text"": ""Do you want users to register or log in to comment on your blog?"",
+      ""type"": ""select"",
+      ""options"": [""Yes"", ""No""]
+    },
+    {
+      ""id"": ""unique_id_4"",
+      ""text"": ""How do you plan to host and deploy your blog (e.g., shared hosting, cloud services)?"",
+      ""type"": ""text"",
+      ""placeholder"": ""Explain your deployment preferences""
+    }
+  ]
+}","Custom function threw error: Custom function must return a boolean, number, or GradingResult object. Got type undefined: undefined
+Stack Trace: Error: Custom function must return a boolean, number, or GradingResult object. Got type undefined: undefined
+    at validateResult (C:\Users\Sahana R Reddy\coding_kickstarter\node_modules\promptfoo\src\assertions\javascript.ts:11:11)
+    at handleJavascript (C:\Users\Sahana R Reddy\coding_kickstarter\node_modules\promptfoo\src\assertions\javascript.ts:61:16)
+    at runAssertion (C:\Users\Sahana R Reddy\coding_kickstarter\node_modules\promptfoo\src\assertions\index.ts:388:20)
+    at C:\Users\Sahana R Reddy\coding_kickstarter\node_modules\promptfoo\src\assertions\index.ts:479:22
+try {
+  const parsed = JSON.parse(output);
+  return parsed.top5 && Array.isArray(parsed.top5) && parsed.top5.length === 5 &&
+         parsed.blueprint && parsed.blueprint.epics;
+} catch {
+  return false;
+}",,"[FAIL] {
+  ""top5"": [
+    {
+      ""title"": ""Initialize Your Blog Project"",
+      ""cursorPrompt"": ""npx create-next-app@latest"",
+      ""command"": ""npx create-next-app your-blog-name"",
+      ""supabaseTip"": ""Creates a new Next.js project, which is the foundation for your blog.""
+    },
+    {
+      ""title"": ""Set Up Markdown Editor"",
+      ""cursorPrompt"": ""npm install react-markdown"",
+      ""command"": ""npm install react-markdown"",
+      ""supabaseTip"": ""Installs the React Markdown library to enable writing articles in Markdown format.""
+    },
+    {
+      ""title"": ""Implement Comment Moderation"",
+      ""cursorPrompt"": ""npm install react-comments-section"",
+      ""command"": ""npm install react-comments-section"",
+      ""supabaseTip"": ""Adds a comments section that requires moderation, allowing you to manage user comments on your blog.""
+    },
+    {
+      ""title"": ""Configure Supabase for Comments Storage"",
+      ""cursorPrompt"": ""supabase start"",
+      ""command"": ""supabase start"",
+      ""supabaseTip"": ""Starts the Supabase service locally for storing comments and managing data flows.""
+    },
+    {
+      ""title"": ""Publish Your Blog"",
+      ""cursorPrompt"": ""npm run build && npm start"",
+      ""command"": ""npm run build && npm start"",
+      ""supabaseTip"": ""Builds and starts your application, making it publicly available for readers.""
+    }
+  ],
+  ""kanbanMarkdown"": ""| To Do | In Progress | Done |\n|---|---|---|\n| Initialize Project | Set Up Editor | Publish Blog |\n| Configure Supabase | Implement Comments |  |"",
+  ""blueprint"": {
+    ""epics"": {
+      ""input"": [""Write Articles"", ""Set Up Markdown""],
+      ""output"": [""Display Blog Posts"", ""Show Comments""],
+      ""export"": [""Export Articles""],
+      ""history"": [""Track Comment Changes"", ""View Article History""]
+    }
+  },
+  ""pdfMeta"": {
+    ""appName"": ""Your Blog"",
+    ""gradient"": [""#3b82f6"", ""#8b5cf6""],
+    ""timestamp"": ""2023-10-06T12:00:00Z""
+  }
+}","Custom function threw error: Custom function must return a boolean, number, or GradingResult object. Got type object: {""input"":[""Write Articles"",""Set Up Markdown""],""output"":[""Display Blog Posts"",""Show Comments""],""export"":[""Export Articles""],""history"":[""Track Comment Changes"",""View Article History""]}
+Stack Trace: Error: Custom function must return a boolean, number, or GradingResult object. Got type object: {""input"":[""Write Articles"",""Set Up Markdown""],""output"":[""Display Blog Posts"",""Show Comments""],""export"":[""Export Articles""],""history"":[""Track Comment Changes"",""View Article History""]}
+    at validateResult (C:\Users\Sahana R Reddy\coding_kickstarter\node_modules\promptfoo\src\assertions\javascript.ts:11:11)
+    at handleJavascript (C:\Users\Sahana R Reddy\coding_kickstarter\node_modules\promptfoo\src\assertions\javascript.ts:61:16)
+    at runAssertion (C:\Users\Sahana R Reddy\coding_kickstarter\node_modules\promptfoo\src\assertions\index.ts:388:20)
+    at C:\Users\Sahana R Reddy\coding_kickstarter\node_modules\promptfoo\src\assertions\index.ts:479:22
+try {
+  const parsed = JSON.parse(output);
+  return parsed.top5 && Array.isArray(parsed.top5) && parsed.top5.length === 5 &&
+         parsed.blueprint && parsed.blueprint.epics;
+} catch {
+  return false;
+}",
+Habit tracker to track my daily routines,habit-tracker-final,"[FAIL] {
+  ""questions"": [
+    {
+      ""id"": ""q1"",
+      ""text"": ""What is your current level of programming experience?"",
+      ""type"": ""select"",
+      ""options"": [""Beginner"", ""Intermediate"", ""Advanced""]
+    },
+    {
+      ""id"": ""q2"",
+      ""text"": ""What key features do you want in your habit tracker (e.g., reminders, stats, sharing)?"",
+      ""type"": ""text"",
+      ""placeholder"": ""List your desired features""
+    },
+    {
+      ""id"": ""q3"",
+      ""text"": ""Do you need user authentication for your app (e.g., login/signup)?"",
+      ""type"": ""select"",
+      ""options"": [""Yes"", ""No""]
+    },
+    {
+      ""id"": ""q4"",
+      ""text"": ""How would you like to store your habit data (e.g., local storage, cloud database)?"",
+      ""type"": ""text"",
+      ""placeholder"": ""Specify your preferred data storage method""
+    }
+  ]
+}","Custom function threw error: Custom function must return a boolean, number, or GradingResult object. Got type undefined: undefined
+Stack Trace: Error: Custom function must return a boolean, number, or GradingResult object. Got type undefined: undefined
+    at validateResult (C:\Users\Sahana R Reddy\coding_kickstarter\node_modules\promptfoo\src\assertions\javascript.ts:11:11)
+    at handleJavascript (C:\Users\Sahana R Reddy\coding_kickstarter\node_modules\promptfoo\src\assertions\javascript.ts:61:16)
+    at runAssertion (C:\Users\Sahana R Reddy\coding_kickstarter\node_modules\promptfoo\src\assertions\index.ts:388:20)
+    at C:\Users\Sahana R Reddy\coding_kickstarter\node_modules\promptfoo\src\assertions\index.ts:479:22
+try {
+  const parsed = JSON.parse(output);
+  return parsed.top5 && Array.isArray(parsed.top5) && parsed.top5.length === 5;
+} catch {
+  return false;
+}",,"[PASS] {
+  ""top5"": [
+    {
+      ""title"": ""Initialize Your Project"",
+      ""cursorPrompt"": ""npx create-next-app@latest habit-tracker --typescript"",
+      ""command"": ""npx create-next-app@latest habit-tracker --typescript"",
+      ""supabaseTip"": ""Creates a new Next.js project with TypeScript to provide type safety and improve development speed.""
+    },
+    {
+      ""title"": ""Set Up Local Storage"",
+      ""cursorPrompt"": ""npm install localforage"",
+      ""command"": ""npm install localforage"",
+      ""supabaseTip"": ""Installs LocalForage to simplify storing data in local storage, allowing you to persist user habit tracking data.""
+    },
+    {
+      ""title"": ""Create Habit Tracking Component"",
+      ""cursorPrompt"": ""touch components/HabitTracker.tsx"",
+      ""command"": ""touch components/HabitTracker.tsx"",
+      ""supabaseTip"": ""Creates a new React component that will be responsible for displaying and managing habit tracking UI.""
+    },
+    {
+      ""title"": ""Implement Daily Check-ins Logic"",
+      ""cursorPrompt"": ""touch hooks/useDailyCheckIn.ts"",
+      ""command"": ""touch hooks/useDailyCheckIn.ts"",
+      ""supabaseTip"": ""Creates a custom hook to manage logic for daily check-ins, encapsulating functionality and keeping the component clean.""
+    },
+    {
+      ""title"": ""Setup Calendar View"",
+      ""cursorPrompt"": ""npm install react-calendar"",
+      ""command"": ""npm install react-calendar"",
+      ""supabaseTip"": ""Installs React Calendar library for an interactive calendar display, allowing users to visualize their habit tracking over time.""
+    }
+  ],
+  ""kanbanMarkdown"": ""| To Do | In Progress | Done |\n|---|---|---|\n| Design UI Layout | Code Habit Tracker Component | Final Testing |"",
+  ""blueprint"": {
+    ""epics"": {
+      ""input"": [""User Login/Signup"", ""Daily Habit Input""],
+      ""output"": [""Daily Check-in Overview"", ""Streak Tracking""],
+      ""export"": [""Data Export Feature""],
+      ""history"": [""Display Historical Habits""]
+    }
+  },
+  ""pdfMeta"": {
+    ""appName"": ""Habit Tracker"",
+    ""gradient"": [""#3b82f6"", ""#8b5cf6""],
+    ""timestamp"": ""2023-10-10T12:00:00Z""
+  }
+}",All assertions passed,
+Recipe sharing app where users can post and rate recipes,recipe-final,"[FAIL] {
+  ""questions"": [
+    {
+      ""id"": ""q1"",
+      ""text"": ""What is your technical experience with app development or programming languages?"",
+      ""type"": ""text"",
+      ""placeholder"": ""e.g., None, beginner, intermediate""
+    },
+    {
+      ""id"": ""q2"",
+      ""text"": ""What key features do you want in your recipe sharing app? (e.g., search, comments, user profiles)"",
+      ""type"": ""text"",
+      ""placeholder"": ""List the features you want""
+    },
+    {
+      ""id"": ""q3"",
+      ""text"": ""How do you prefer to authenticate users? (e.g., email/password, social media logins)"",
+      ""type"": ""select"",
+      ""options"": [""Email and Password"", ""Google Login"", ""Facebook Login"", ""No Authentication""]
+    },
+    {
+      ""id"": ""q4"",
+      ""text"": ""What type of user interface experience are you envisioning for your app? (e.g., simple, minimalist, vibrant)"",
+      ""type"": ""text"",
+      ""placeholder"": ""Describe your UI/UX expectations""
+    }
+  ]
+}","Custom function threw error: Custom function must return a boolean, number, or GradingResult object. Got type undefined: undefined
+Stack Trace: Error: Custom function must return a boolean, number, or GradingResult object. Got type undefined: undefined
+    at validateResult (C:\Users\Sahana R Reddy\coding_kickstarter\node_modules\promptfoo\src\assertions\javascript.ts:11:11)
+    at handleJavascript (C:\Users\Sahana R Reddy\coding_kickstarter\node_modules\promptfoo\src\assertions\javascript.ts:61:16)
+    at runAssertion (C:\Users\Sahana R Reddy\coding_kickstarter\node_modules\promptfoo\src\assertions\index.ts:388:20)
+    at C:\Users\Sahana R Reddy\coding_kickstarter\node_modules\promptfoo\src\assertions\index.ts:479:22
+try {
+  const parsed = JSON.parse(output);
+  return parsed.top5 && Array.isArray(parsed.top5) && parsed.top5.length === 5;
+} catch {
+  return false;
+}",,"[FAIL] {
+  ""top5"": [
+    {
+      ""title"": ""Initialize Your Recipe Sharing App"",
+      ""cursorPrompt"": ""npx create-next-app recipe-sharing-app"",
+      ""command"": ""npx create-next-app recipe-sharing-app"",
+      ""supabaseTip"": ""Creates a new Next.js project named 'recipe-sharing-app' where you will build your application.""
+    },
+    {
+      ""title"": ""Set Up Supabase for Data Management"",
+      ""cursorPrompt"": ""npx supabase init"",
+      ""command"": ""npx supabase init"",
+      ""supabaseTip"": ""Initializes a Supabase project which allows you to manage your recipes and ratings using a cloud database.""
+    },
+    {
+      ""title"": ""Create Recipe Table in Supabase"",
+      ""cursorPrompt"": ""supabase db push"",
+      ""command"": ""supabase db push"",
+      ""supabaseTip"": ""Pushes your local schema to Supabase, creating the necessary tables to store recipes and ratings.""
+    },
+    {
+      ""title"": ""Configure User Authentication"",
+      ""cursorPrompt"": ""supabase auth signup"",
+      ""command"": ""supabase auth signup"",
+      ""supabaseTip"": ""Sets up user authentication so that users can create accounts to post and rate recipes securely.""
+    },
+    {
+      ""title"": ""Integrate Image Uploads for Recipes"",
+      ""cursorPrompt"": ""npm install react-dropzone"",
+      ""command"": ""npm install react-dropzone"",
+      ""supabaseTip"": ""Installs the 'react-dropzone' library which helps in implementing image uploads for recipe postings.""
+    }
+  ],
+  ""kanbanMarkdown"": ""| To Do | In Progress | Done |\n|---|---|---|\n| Build UI for recipe sharing | Implement rating system | |"",
+  ""blueprint"": {
+    ""epics"": {
+      ""input"": [""User submits their recipes"", ""Users upload images of recipes""],
+      ""output"": [""Users view submitted recipes"", ""Users rate recipes""],
+      ""export"": [""Users can share recipes externally""],
+      ""history"": [""Track user ratings over time"", ""Maintain submission history""]
+    }
+  },
+  ""pdfMeta"": {
+    ""appName"": ""Recipe Sharing App"",
+    ""gradient"": [""#3b82f6"", ""#8b5cf6""],
+    ""timestamp"": ""2023-10-01T12:00:00Z""
+  }
+}",Latency 14879ms is greater than threshold 10000ms,
+Simple landing page with a contact form,landing-page-final,"[FAIL] {
+  ""questions"": [
+    {
+      ""id"": ""q1"",
+      ""text"": ""What is your level of experience with web development?"",
+      ""type"": ""select"",
+      ""options"": [""Beginner"", ""Intermediate"", ""Advanced""]
+    },
+    {
+      ""id"": ""q2"",
+      ""text"": ""What specific fields do you want in your contact form (e.g., name, email, message)?"",
+      ""type"": ""text"",
+      ""placeholder"": ""List the fields you want""
+    },
+    {
+      ""id"": ""q3"",
+      ""text"": ""Do you need to store the contact form submissions somewhere (e.g., database, email notification)?"",
+      ""type"": ""select"",
+      ""options"": [""Yes, a database"", ""Yes, email"", ""No""]
+    },
+    {
+      ""id"": ""q4"",
+      ""text"": ""What type of deployment method do you prefer (e.g., hosting service, local server)?"",
+      ""type"": ""select"",
+      ""options"": [""GitHub Pages"", ""Netlify"", ""Heroku"", ""Local Server""]
+    }
+  ]
+}","Custom function threw error: Custom function must return a boolean, number, or GradingResult object. Got type undefined: undefined
+Stack Trace: Error: Custom function must return a boolean, number, or GradingResult object. Got type undefined: undefined
+    at validateResult (C:\Users\Sahana R Reddy\coding_kickstarter\node_modules\promptfoo\src\assertions\javascript.ts:11:11)
+    at handleJavascript (C:\Users\Sahana R Reddy\coding_kickstarter\node_modules\promptfoo\src\assertions\javascript.ts:61:16)
+    at runAssertion (C:\Users\Sahana R Reddy\coding_kickstarter\node_modules\promptfoo\src\assertions\index.ts:388:20)
+    at C:\Users\Sahana R Reddy\coding_kickstarter\node_modules\promptfoo\src\assertions\index.ts:479:22
+try {
+  const parsed = JSON.parse(output);
+  return parsed.top5 && Array.isArray(parsed.top5) && parsed.top5.length === 5;
+} catch {
+  return false;
+}",,"[PASS] {
+  ""top5"": [
+    {
+      ""title"": ""Initialize Your Project"",
+      ""cursorPrompt"": ""npx create-next-app@latest my-landing-page"",
+      ""command"": ""npx create-next-app@latest my-landing-page"",
+      ""supabaseTip"": ""Creates a new Next.js project with the specified name. This sets up the structure and necessary files for your landing page.""
+    },
+    {
+      ""title"": ""Install Necessary Packages"",
+      ""cursorPrompt"": ""npm install --save dotenv nodemailer"",
+      ""command"": ""npm install --save dotenv nodemailer"",
+      ""supabaseTip"": ""Installs the dotenv package for environment variable support and nodemailer for handling email notifications from your contact form.""
+    },
+    {
+      ""title"": ""Create Contact Form Component"",
+      ""cursorPrompt"": ""touch components/ContactForm.js"",
+      ""command"": ""touch components/ContactForm.js"",
+      ""supabaseTip"": ""Creates a new component file for your contact form, which will handle user inputs and form submissions.""
+    },
+    {
+      ""title"": ""Set Up Email Notification Logic"",
+      ""cursorPrompt"": ""touch utils/sendEmail.js"",
+      ""command"": ""touch utils/sendEmail.js"",
+      ""supabaseTip"": ""Creates a utility file that will contain the logic to send email notifications when the contact form is submitted.""
+    },
+    {
+      ""title"": ""Deploy Your Landing Page"",
+      ""cursorPrompt"": ""vercel --prod"",
+      ""command"": ""vercel --prod"",
+      ""supabaseTip"": ""Deploys your application to Vercel, making your landing page live and accessible to users.""
+    }
+  ],
+  ""kanbanMarkdown"": ""| To Do | In Progress | Done |\n|---|---|---|\n| Initialize Project | Install Packages | Deploy Landing Page |\n| Create Contact Form Component | Set Up Email Logic |  |"",
+  ""blueprint"": {
+    ""epics"": {
+      ""input"": [""Create a user-friendly contact form interface"", ""Handle user inputs for name, email, and message""],
+      ""output"": [""Send email notifications upon form submission""],
+      ""export"": [""Implement a method to export user data for further analysis""],
+      ""history"": [""Log past messages sent through the contact form""]
+    }
+  },
+  ""pdfMeta"": {
+    ""appName"": ""My Landing Page"",
+    ""gradient"": [""#3b82f6"", ""#8b5cf6""],
+    ""timestamp"": ""2023-10-01T12:00:00Z""
+  }
+}",All assertions passed,
+SaaS dashboard with Stripe payments and user subscriptions,saas-stripe-final,"[FAIL] {
+  ""questions"": [
+    {
+      ""id"": ""q1"",
+      ""text"": ""What is your current technical skill level (e.g., beginner, intermediate, advanced)?"",
+      ""type"": ""select"",
+      ""options"": [""Beginner"", ""Intermediate"", ""Advanced""]
+    },
+    {
+      ""id"": ""q2"",
+      ""text"": ""What specific features do you want in your SaaS dashboard (e.g., user analytics, payment history)?"",
+      ""type"": ""text"",
+      ""placeholder"": ""List key features""
+    },
+    {
+      ""id"": ""q3"",
+      ""text"": ""What data storage solutions are you considering (e.g., SQL database, NoSQL, cloud storage)?"",
+      ""type"": ""text"",
+      ""placeholder"": ""Specify your storage preference""
+    },
+    {
+      ""id"": ""q4"",
+      ""text"": ""How do you envision the user authentication process (e.g., email/password, social login)?"",
+      ""type"": ""text"",
+      ""placeholder"": ""Describe your authentication needs""
+    }
+  ]
+}","Custom function threw error: Custom function must return a boolean, number, or GradingResult object. Got type undefined: undefined
+Stack Trace: Error: Custom function must return a boolean, number, or GradingResult object. Got type undefined: undefined
+    at validateResult (C:\Users\Sahana R Reddy\coding_kickstarter\node_modules\promptfoo\src\assertions\javascript.ts:11:11)
+    at handleJavascript (C:\Users\Sahana R Reddy\coding_kickstarter\node_modules\promptfoo\src\assertions\javascript.ts:61:16)
+    at runAssertion (C:\Users\Sahana R Reddy\coding_kickstarter\node_modules\promptfoo\src\assertions\index.ts:388:20)
+    at C:\Users\Sahana R Reddy\coding_kickstarter\node_modules\promptfoo\src\assertions\index.ts:479:22
+try {
+  const parsed = JSON.parse(output);
+  return parsed.top5 && Array.isArray(parsed.top5) && parsed.top5.length === 5;
+} catch {
+  return false;
+}",,"[PASS] {
+  ""top5"": [
+    {
+      ""title"": ""Initialize Your SaaS Dashboard Project"",
+      ""cursorPrompt"": ""npx create-next-app@latest my-saas-dashboard --typescript"",
+      ""command"": ""npx create-next-app@latest my-saas-dashboard --typescript"",
+      ""supabaseTip"": ""Creates a new Next.js project with TypeScript, setting the foundation for your SaaS dashboard.""
+    },
+    {
+      ""title"": ""Set Up Supabase for User Management"",
+      ""cursorPrompt"": ""npx supabase init"",
+      ""command"": ""npx supabase init"",
+      ""supabaseTip"": ""Initializes a new Supabase project in your current directory, essential for managing user data.""
+    },
+    {
+      ""title"": ""Integrate Stripe for Payment Processing"",
+      ""cursorPrompt"": ""npm install stripe"",
+      ""command"": ""npm install stripe"",
+      ""supabaseTip"": ""Installs the Stripe SDK, allowing your app to handle transactions and subscriptions seamlessly.""
+    },
+    {
+      ""title"": ""Implement User Subscription Logic"",
+      ""cursorPrompt"": ""npm install @supabase/supabase-js"",
+      ""command"": ""npm install @supabase/supabase-js"",
+      ""supabaseTip"": ""Installs the Supabase client library, crucial for managing user subscriptions and interacting with your database.""
+    },
+    {
+      ""title"": ""Create Admin Dashboard for User Management"",
+      ""cursorPrompt"": ""npx next dev"",
+      ""command"": ""npx next dev"",
+      ""supabaseTip"": ""Starts your development server, enabling you to view and manage your admin dashboard in the browser.""
+    }
+  ],
+  ""kanbanMarkdown"": ""| To Do | In Progress | Done |\n|---|---|---|\n| Set up payment processing | Integrate user management | Validate user subscriptions |"",
+  ""blueprint"": {
+    ""epics"": {
+      ""input"": [""User registration and login"", ""Payment plan selection""],
+      ""output"": [""User dashboard displaying subscription status""],
+      ""export"": [""CSV report of subscriptions""],
+      ""history"": [""Log of user activities and subscription changes""]
+    }
+  },
+  ""pdfMeta"": {
+    ""appName"": ""My SaaS Dashboard"",
+    ""gradient"": [""#3b82f6"", ""#8b5cf6""],
+    ""timestamp"": ""2023-10-02T14:30:00Z""
+  }
+}",All assertions passed,

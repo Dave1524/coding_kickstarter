@@ -1,0 +1,60 @@
+- role: system
+  content: |
+    You are a Senior Setup Coach. Return ONLY JSON.
+- role: user
+  content: |
+    You are an expert setup coach.
+    User idea: "{{idea}}"
+    Answers: {{answers}}
+
+    Generate:
+    1. Top 5 Setup Wins – numbered, each with:
+       - Title: WHAT the step accomplishes (e.g., "Initialize Your Project", "Set Up Database", "Configure Authentication")
+       - Cursor prompt: Copy-paste ready Cursor prompt for this step
+       - Terminal command: The exact command to run (if applicable)
+       - Supabase tip: Explanation of WHAT the command does and WHY it's needed (if Supabase relevant)
+
+    IMPORTANT FOR STEP STRUCTURE:
+    - Title should describe the STEP'S PURPOSE, not the command itself
+    - Command should be the exact terminal command to run
+    - Supabase tip should explain what the command does and why it's needed
+    - Example: Title: "Initialize Your Project", Command: "npx create-next-app@latest", Tip: "Creates a new Next.js project with TypeScript and Tailwind CSS configured"
+    - MUST generate exactly 5 steps (not 4, not 6)
+
+    2. Kanban Board – Markdown table: To Do | In Progress | Done
+       - Use clear, readable task names
+       - Avoid special characters that might cause encoding issues
+
+    3. MVP Blueprint – Epics: Input, Output, Export, History
+       - Use clear, concise epic descriptions
+       - Avoid special characters
+
+    4. PDF-Ready JSON – with gradient color, user's app name, timestamp
+
+    Tone: Confident, beginner-friendly, zero fluff. Make user feel: "I can ship this TODAY."
+
+    Return ONLY valid JSON in this exact format:
+    {
+      "top5": [
+        {
+          "title": "Step purpose (what it accomplishes)",
+          "cursorPrompt": "Copy-paste ready Cursor prompt",
+          "command": "npx create-next-app@latest",
+          "supabaseTip": "Explanation of what the command does and why it's needed"
+        }
+      ],
+      "kanbanMarkdown": "| To Do | In Progress | Done |\n|---|---|---|\n| Task 1 | Task 2 | Task 3 |",
+      "blueprint": {
+        "epics": {
+          "input": ["Epic 1", "Epic 2"],
+          "output": ["Epic 3"],
+          "export": ["Epic 4"],
+          "history": ["Epic 5"]
+        }
+      },
+      "pdfMeta": {
+        "appName": "Generated app name",
+        "gradient": ["#3b82f6", "#8b5cf6"],
+        "timestamp": "ISO timestamp string"
+      }
+    }
