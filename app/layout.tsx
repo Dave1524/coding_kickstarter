@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     images: [
       {
-        url: "https://codingkickstarter.com/Images/og-image.png",
+        url: "https://codingkickstarter.com/images/og-image.png",
         width: 1200,
         height: 630,
         alt: "Coding Kickstarter - AI-Powered Setup Guides",
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Coding Kickstarter - AI-Powered Setup Guides",
     description: "Get instant AI-generated setup guides for your coding projects. Turn ideas into MVPs in minutes.",
-    images: ["https://codingkickstarter.com/Images/og-image.png"],
+    images: ["https://codingkickstarter.com/images/og-image.png"],
     site: "@CodeKickstarter",
   },
 };
