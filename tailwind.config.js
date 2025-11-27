@@ -62,26 +62,52 @@ module.exports = {
   				'monospace'
   			]
   		},
-		borderRadius: {
-			lg: 'var(--radius)',
-			md: 'calc(var(--radius) - 2px)',
-			sm: 'calc(var(--radius) - 4px)'
-		},
-		keyframes: {
-			marquee: {
-				'0%': { transform: 'translateX(0)' },
-				'100%': { transform: 'translateX(-50%)' },
-			},
-			'marquee-reverse': {
-				'0%': { transform: 'translateX(-50%)' },
-				'100%': { transform: 'translateX(0)' },
-			},
-		},
-		animation: {
-			marquee: 'marquee linear infinite',
-			'marquee-reverse': 'marquee-reverse linear infinite',
-		}
-	}
+  		borderRadius: {
+  			lg: 'var(--radius)',
+  			md: 'calc(var(--radius) - 2px)',
+  			sm: 'calc(var(--radius) - 4px)'
+  		},
+  		keyframes: {
+  			marquee: {
+  				'0%': {
+  					transform: 'translateX(0)'
+  				},
+  				'100%': {
+  					transform: 'translateX(-50%)'
+  				}
+  			},
+  			'marquee-reverse': {
+  				'0%': {
+  					transform: 'translateX(-50%)'
+  				},
+  				'100%': {
+  					transform: 'translateX(0)'
+  				}
+  			},
+  			'accordion-down': {
+  				from: {
+  					height: '0'
+  				},
+  				to: {
+  					height: 'var(--radix-accordion-content-height)'
+  				}
+  			},
+  			'accordion-up': {
+  				from: {
+  					height: 'var(--radix-accordion-content-height)'
+  				},
+  				to: {
+  					height: '0'
+  				}
+  			}
+  		},
+  		animation: {
+  			marquee: 'marquee linear infinite',
+  			'marquee-reverse': 'marquee-reverse linear infinite',
+  			'accordion-down': 'accordion-down 0.2s ease-out',
+  			'accordion-up': 'accordion-up 0.2s ease-out'
+  		}
+  	}
   },
   plugins: [require("tailwindcss-animate")],
 };

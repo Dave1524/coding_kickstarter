@@ -12,6 +12,7 @@ import SkipBanner from '@/components/SkipBanner';
 import SkipWarning from '@/components/SkipWarning';
 import DraftBanner from '@/components/DraftBanner';
 import TaskList from '@/components/TaskList';
+import BoilerplateDownload from '@/components/BoilerplateDownload';
 import { HeroSection } from '@/components/HeroSection';
 import { BackgroundCanvas } from '@/components/BackgroundCanvas';
 import { Button } from '@/components/ui/button';
@@ -20,6 +21,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Marquee } from '@/components/ui/marquee';
+import ScrollReveal from '@/components/ScrollReveal';
 // Temporarily disabled Select import due to Turbopack module resolution issue
 // TODO: Re-enable once Turbopack resolves @radix-ui/react-select properly
 // import {
@@ -567,6 +569,58 @@ export default function Home() {
     }
   }
 
+  // Helper function to generate expected output based on command
+  const generateExpectedOutput = (command: string, title: string): string[] => {
+    const cmd = command.toLowerCase();
+    
+    // Common patterns for expected outputs
+    if (cmd.includes('create-next-app') || cmd.includes('npx create')) {
+      return [
+        'Success! Created',
+        'Installing packages',
+        'Initializing project',
+      ];
+    }
+    
+    if (cmd.includes('npm install') || cmd.includes('npm i ') || cmd.includes('yarn add') || cmd.includes('pnpm add')) {
+      return [
+        'added',
+        'packages',
+        'dependencies',
+      ];
+    }
+    
+    if (cmd.includes('git init')) {
+      return [
+        'Initialized empty Git repository',
+        'Initialized git repository',
+      ];
+    }
+    
+    if (cmd.includes('supabase')) {
+      return [
+        'supabase',
+        'Local development',
+        'started',
+      ];
+    }
+    
+    if (cmd.includes('npm run dev') || cmd.includes('yarn dev') || cmd.includes('pnpm dev')) {
+      return [
+        'Ready',
+        'localhost',
+        'compiled',
+      ];
+    }
+    
+    // Generic fallback
+    return [
+      'Success',
+      'completed',
+      'ready',
+    ];
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col relative">
       {/* Global Animated Background */}
@@ -575,9 +629,9 @@ export default function Home() {
       {/* Navbar */}
       <nav className="w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <div className="flex items-center">
+          <div className="flex items-center h-16">
+            {/* Logo - Left */}
+            <div className="flex items-center flex-1">
               <Link href="/" className="flex items-center gap-2">
                 <div className="relative">
                   <div className="absolute inset-0 bg-primary rounded-full blur-sm opacity-30"></div>
@@ -613,10 +667,10 @@ export default function Home() {
             </div>
 
             {/* CTA Buttons - Right */}
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 flex-1 justify-end">
               <Button 
                 size="sm" 
-                className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs sm:text-sm rounded-xl"
+                className="hidden md:inline-flex bg-primary hover:bg-primary/90 text-primary-foreground text-xs sm:text-sm rounded-xl"
                 onClick={() => setEarlyOpen(true)}
               >
                 Join up
@@ -734,19 +788,6 @@ export default function Home() {
               <p id="idea-description" className="sr-only">
                 Enter your project idea. This will be used to generate personalized setup questions.
               </p>
-
-            {/* Loading Questions State */}
-            {loadingQuestions && (
-              <div className="mt-6 text-center py-4 animate-fade-in" role="status" aria-live="polite">
-                <div className="flex items-center justify-center gap-2 text-primary">
-                  <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  <span className="font-semibold">Generating questions...</span>
-                </div>
-              </div>
-            )}
 
             {/* AI Expansion Alert */}
             {questionsAddedCount > 0 && (
@@ -871,8 +912,8 @@ export default function Home() {
 
             {/* Show answers so far */}
             {(Object.keys(answers).length > 0 || skippedQuestions.size > 0) && (
-              <div className="mt-4 text-sm text-gray-600 space-y-1">
-                <div className="font-semibold text-gray-700 mb-1">
+              <div className="mt-4 text-sm text-muted-foreground space-y-1">
+                <div className="font-semibold text-foreground mb-1">
                   Answered: {Object.keys(answers).length}/{questionSet.length}
                   {skippedQuestions.size > 0 && ` (${skippedQuestions.size} skipped)`}
                 </div>
@@ -898,8 +939,8 @@ export default function Home() {
                       }}
                       aria-label={`Edit answer for ${question?.text}`}
                     >
-                      <span className="font-semibold text-gray-700">{question?.text.split('?')[0] || key}:</span>
-                      <span>{escapeHtml(value)}</span>
+                      <span className="font-semibold text-foreground">{question?.text.split('?')[0] || key}:</span>
+                      <span className="text-muted-foreground">{escapeHtml(value)}</span>
                       <span className="text-primary ml-auto text-xs">✏️ Edit</span>
                     </div>
                   );
@@ -912,7 +953,7 @@ export default function Home() {
                   return (
                     <div 
                       key={skippedId}
-                      className="flex items-start gap-2 cursor-pointer hover:bg-yellow-50 p-2 rounded transition-colors border border-yellow-200"
+                      className="flex items-start gap-2 cursor-pointer hover:bg-yellow-50 dark:hover:bg-yellow-900/20 p-2 rounded transition-colors border border-yellow-200 dark:border-yellow-800"
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
@@ -961,8 +1002,8 @@ export default function Home() {
                       }}
                       aria-label={`Answer skipped question: ${question.text}`}
                     >
-                      <span className="font-semibold text-gray-700">{question.text.split('?')[0] || skippedId}:</span>
-                      <span className="text-yellow-600 italic flex items-center gap-1">
+                      <span className="font-semibold text-foreground">{question.text.split('?')[0] || skippedId}:</span>
+                      <span className="text-yellow-600 dark:text-yellow-400 italic flex items-center gap-1">
                         <span>⚠️</span>
                         <span>Skipped</span>
                       </span>
@@ -1079,14 +1120,14 @@ export default function Home() {
             {/* Task List */}
             <TaskList
               tasks={result.output.top5.map((step, i) => {
-                // Assign priority based on position
-                let priority: 'High' | 'Medium' | 'Low';
+                // Assign priority based on position - map to new system
+                let priority: 'critical' | 'recommended' | 'optional';
                 if (i < 2) {
-                  priority = 'High';
+                  priority = 'critical';
                 } else if (i < 4) {
-                  priority = 'Medium';
+                  priority = 'recommended';
                 } else {
-                  priority = 'Low';
+                  priority = 'optional';
                 }
 
                 // Build explanation: prefer supabaseTip (explains what/why), fallback to cursorPrompt
@@ -1100,15 +1141,29 @@ export default function Home() {
                   explanation = `Complete this step to move your project forward`;
                 }
 
+                // Extract "why" from supabaseTip (first sentence or whole thing if short)
+                const why = step.supabaseTip || step.cursorPrompt ? 
+                  (step.supabaseTip?.split('.')[0] || step.cursorPrompt?.split('.')[0] || '') : 
+                  undefined;
+
                 // Get commands if available
                 const commands = step.command ? [step.command] : undefined;
+
+                // Generate expected output based on command type
+                const expectedOutput = step.command ? generateExpectedOutput(step.command, step.title) : undefined;
+
+                // Determine where the step should be run
+                const where = step.command ? 'terminal' as const : 'cursor' as const;
 
                 return {
                   number: i + 1,
                   priority,
                   title: step.title,
                   explanation,
+                  why,
                   commands,
+                  expectedOutput,
+                  where,
                 };
               })}
             />
@@ -1167,6 +1222,13 @@ export default function Home() {
               </Card>
             )}
 
+            {/* Get Starter Repo */}
+            <BoilerplateDownload
+              idea={result.idea}
+              answers={result.answers}
+              suggestedName={result.output.pdfMeta?.appName?.toLowerCase().replace(/\s+/g, '-')}
+            />
+
             {/* Action Buttons */}
             <div className="space-y-4 pt-4">
               {/* Row 1: PDF Download and Save Sprint */}
@@ -1184,14 +1246,14 @@ export default function Home() {
                       };
                     }),
                     steps: result.output.top5.map((s, i) => {
-                      // Assign priority based on position
+                      // Map new priority system to legacy for PDF compatibility
                       let priority: 'High' | 'Medium' | 'Low';
                       if (i < 2) {
-                        priority = 'High';
+                        priority = 'High'; // critical
                       } else if (i < 4) {
-                        priority = 'Medium';
+                        priority = 'Medium'; // recommended
                       } else {
-                        priority = 'Low';
+                        priority = 'Low'; // optional
                       }
 
                       // Build explanation: prefer supabaseTip (explains what/why), fallback to cursorPrompt
@@ -1418,39 +1480,45 @@ export default function Home() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="border-border text-center">
-              <CardHeader>
-                <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center mx-auto mb-4 text-2xl font-bold text-primary-foreground">
-                  1
-                </div>
-                <CardTitle className="text-xl">Enter Your Idea</CardTitle>
-                <CardDescription>
-                  Tell us what you want to build. It can be anything—a todo app, chat app, e-commerce store, or something completely unique.
-                </CardDescription>
-              </CardHeader>
-            </Card>
-            <Card className="border-border text-center">
-              <CardHeader>
-                <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center mx-auto mb-4 text-2xl font-bold text-primary-foreground">
-                  2
-                </div>
-                <CardTitle className="text-xl">Answer Questions</CardTitle>
-                <CardDescription>
-                  Our AI asks 3-7 clarifying questions to understand your project better. Skip questions you're unsure about—we'll work with what you provide.
-                </CardDescription>
-              </CardHeader>
-            </Card>
-            <Card className="border-border text-center">
-              <CardHeader>
-                <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center mx-auto mb-4 text-2xl font-bold text-primary-foreground">
-                  3
-                </div>
-                <CardTitle className="text-xl">Get Your Guide</CardTitle>
-                <CardDescription>
-                  Receive your personalized setup guide with top 5 steps, Kanban board, MVP blueprint, and PDF export option. Start coding immediately!
-                </CardDescription>
-              </CardHeader>
-            </Card>
+            <ScrollReveal delay="200ms">
+              <Card className="border-border text-center hover:-translate-y-1 hover:shadow-lg transition-all duration-300 h-full">
+                <CardHeader>
+                  <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center mx-auto mb-4 text-2xl font-bold text-primary-foreground">
+                    1
+                  </div>
+                  <CardTitle className="text-xl">Enter Your Idea</CardTitle>
+                  <CardDescription>
+                    Tell us what you want to build. It can be anything—a todo app, chat app, e-commerce store, or something completely unique.
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </ScrollReveal>
+            <ScrollReveal delay="400ms">
+              <Card className="border-border text-center hover:-translate-y-1 hover:shadow-lg transition-all duration-300 h-full">
+                <CardHeader>
+                  <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center mx-auto mb-4 text-2xl font-bold text-primary-foreground">
+                    2
+                  </div>
+                  <CardTitle className="text-xl">Answer Questions</CardTitle>
+                  <CardDescription>
+                    Our AI asks 3-7 clarifying questions to understand your project better. Skip questions you're unsure about—we'll work with what you provide.
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </ScrollReveal>
+            <ScrollReveal delay="600ms">
+              <Card className="border-border text-center hover:-translate-y-1 hover:shadow-lg transition-all duration-300 h-full">
+                <CardHeader>
+                  <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center mx-auto mb-4 text-2xl font-bold text-primary-foreground">
+                    3
+                  </div>
+                  <CardTitle className="text-xl">Get Your Guide</CardTitle>
+                  <CardDescription>
+                    Receive your personalized setup guide with top 5 steps, Kanban board, MVP blueprint, and PDF export option. Start coding immediately!
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </ScrollReveal>
           </div>
         </div>
       </section>
@@ -1469,102 +1537,110 @@ export default function Home() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="border-border hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <CardTitle>Todo App for 100 Users</CardTitle>
-                <CardDescription>
-                  Build a scalable todo application with user authentication, task management, and real-time updates.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li className="flex items-center gap-2">
-                    <span className="text-primary">✓</span>
-                    User authentication & authorization
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-primary">✓</span>
-                    CRUD operations for tasks
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-primary">✓</span>
-                    Database schema & migrations
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-            <Card className="border-border hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <CardTitle>Chat App with Real-Time Messaging</CardTitle>
-                <CardDescription>
-                  Create a real-time chat application with WebSocket support, message history, and user presence.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li className="flex items-center gap-2">
-                    <span className="text-primary">✓</span>
-                    WebSocket integration
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-primary">✓</span>
-                    Message persistence
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-primary">✓</span>
-                    User presence indicators
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-            <Card className="border-border hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <CardTitle>E-Commerce Store with Payments</CardTitle>
-                <CardDescription>
-                  Launch an e-commerce platform with product catalog, shopping cart, and secure payment processing.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li className="flex items-center gap-2">
-                    <span className="text-primary">✓</span>
-                    Product management
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-primary">✓</span>
-                    Shopping cart functionality
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-primary">✓</span>
-                    Payment gateway integration
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-            <Card className="border-border hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <CardTitle>Weather App Using Public APIs</CardTitle>
-                <CardDescription>
-                  Build a weather application that fetches data from public APIs and displays forecasts beautifully.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li className="flex items-center gap-2">
-                    <span className="text-primary">✓</span>
-                    API integration
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-primary">✓</span>
-                    Location-based data
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <span className="text-primary">✓</span>
-                    Responsive UI design
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
+            <ScrollReveal delay="200ms">
+              <Card className="border-border hover:shadow-lg transition-shadow h-full">
+                <CardHeader>
+                  <CardTitle>Todo App for 100 Users</CardTitle>
+                  <CardDescription>
+                    Build a scalable todo application with user authentication, task management, and real-time updates.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li className="flex items-center gap-2">
+                      <span className="text-primary">✓</span>
+                      User authentication & authorization
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-primary">✓</span>
+                      CRUD operations for tasks
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-primary">✓</span>
+                      Database schema & migrations
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </ScrollReveal>
+            <ScrollReveal delay="400ms">
+              <Card className="border-border hover:shadow-lg transition-shadow h-full">
+                <CardHeader>
+                  <CardTitle>Chat App with Real-Time Messaging</CardTitle>
+                  <CardDescription>
+                    Create a real-time chat application with WebSocket support, message history, and user presence.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li className="flex items-center gap-2">
+                      <span className="text-primary">✓</span>
+                      WebSocket integration
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-primary">✓</span>
+                      Message persistence
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-primary">✓</span>
+                      User presence indicators
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </ScrollReveal>
+            <ScrollReveal delay="600ms">
+              <Card className="border-border hover:shadow-lg transition-shadow h-full">
+                <CardHeader>
+                  <CardTitle>E-Commerce Store with Payments</CardTitle>
+                  <CardDescription>
+                    Launch an e-commerce platform with product catalog, shopping cart, and secure payment processing.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li className="flex items-center gap-2">
+                      <span className="text-primary">✓</span>
+                      Product management
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-primary">✓</span>
+                      Shopping cart functionality
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-primary">✓</span>
+                      Payment gateway integration
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </ScrollReveal>
+            <ScrollReveal delay="800ms">
+              <Card className="border-border hover:shadow-lg transition-shadow h-full">
+                <CardHeader>
+                  <CardTitle>Weather App Using Public APIs</CardTitle>
+                  <CardDescription>
+                    Build a weather application that fetches data from public APIs and displays forecasts beautifully.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li className="flex items-center gap-2">
+                      <span className="text-primary">✓</span>
+                      API integration
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-primary">✓</span>
+                      Location-based data
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-primary">✓</span>
+                      Responsive UI design
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </ScrollReveal>
           </div>
         </div>
       </section>

@@ -90,6 +90,42 @@ class Analytics {
     });
   }
 
+  // Deep link events
+  deepLinkClicked(stepNumber: number, isFirstStep: boolean) {
+    this.track('deep_link_clicked', {
+      step_number: stepNumber,
+      is_first_step: isFirstStep,
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  deepLinkSuccess(stepNumber: number, isFirstStep: boolean) {
+    this.track('deep_link_success', {
+      step_number: stepNumber,
+      is_first_step: isFirstStep,
+    });
+  }
+
+  deepLinkFailed(stepNumber: number, error: string) {
+    this.track('deep_link_failed', {
+      step_number: stepNumber,
+      error,
+    });
+  }
+
+  taskCompleted(taskId: string, isAutoDetected: boolean) {
+    this.track('task_completed', {
+      task_id: taskId,
+      is_auto_detected: isAutoDetected,
+    });
+  }
+
+  commandCopied(stepNumber: number) {
+    this.track('command_copied', {
+      step_number: stepNumber,
+    });
+  }
+
   // Get events for debugging/export
   getEvents(): AnalyticsEvent[] {
     return [...this.events];

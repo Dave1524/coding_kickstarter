@@ -95,6 +95,95 @@ html {
   animation: fadeSlideIn 1s ease-out 1s both;
 }
 
+/* Deep Link Button Animations */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4), 0 10px 25px -5px rgba(249, 115, 22, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(249, 115, 22, 0), 0 10px 25px -5px rgba(249, 115, 22, 0.5);
+  }
+}
+
+@keyframes slide-up-fade {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-out-down {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-slide-up-fade {
+  animation: slide-up-fade 0.3s ease-out;
+}
+
+.animate-fade-out-down {
+  animation: fade-out-down 0.3s ease-out forwards;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Task card completion styles */
+.task-completed {
+  @apply opacity-60;
+}
+
+.task-completed .task-title {
+  @apply line-through;
+}
+
+/* Step number gradient styles */
+.step-number-gradient {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+}
+
+.step-number-gradient-magic {
+  background: linear-gradient(135deg, #fde047 0%, #f59e0b 50%, #ea580c 100%);
+  box-shadow: 0 0 20px rgba(249, 115, 22, 0.4);
+}
+
+/* Code block styles */
+.code-block {
+  @apply bg-zinc-900 dark:bg-zinc-950 text-zinc-100 rounded-lg border border-zinc-700;
+  font-family: var(--font-mono);
+}
+
 @layer base {
   * {
     @apply border-border;
