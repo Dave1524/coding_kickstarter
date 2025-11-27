@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { exchangeCodeForToken, getGitHubOAuthUrl, validateToken } from '@/lib/github';
+import { exchangeCodeForToken, getGitHubOAuthUrl, validateToken, generatePKCE } from '@/lib/github';
 import { cookies } from 'next/headers';
 
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID || '';
@@ -44,6 +44,7 @@ function getRedirectUri(request: NextRequest): string {
 // Cookie settings
 const GITHUB_TOKEN_COOKIE = 'github_token';
 const OAUTH_STATE_COOKIE = 'github_oauth_state';
+const OAUTH_CODE_VERIFIER_COOKIE = 'github_code_verifier'; // For PKCE
 const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
@@ -132,6 +133,8 @@ export async function DELETE() {
 
 /**
  * Initiate the OAuth flow
+ * Follows GitHub OAuth web application flow best practices
+ * See: https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#web-application-flow
  */
 async function initiateOAuth(request: NextRequest): Promise<NextResponse> {
   if (!GITHUB_CLIENT_ID) {
@@ -141,14 +144,23 @@ async function initiateOAuth(request: NextRequest): Promise<NextResponse> {
     );
   }
 
-  // Generate random state for CSRF protection
+  // Generate random state for CSRF protection (strongly recommended by GitHub)
   const state = generateState();
+  
+  // Generate PKCE code verifier and challenge (strongly recommended for security)
+  const { codeVerifier, codeChallenge } = await generatePKCE();
+  
   const redirectUri = getRedirectUri(request);
-  const authUrl = getGitHubOAuthUrl(GITHUB_CLIENT_ID, redirectUri, state);
+  const authUrl = getGitHubOAuthUrl(GITHUB_CLIENT_ID, redirectUri, state, codeChallenge);
 
-  // Store state in cookie for verification
+  // Store state and code verifier in cookies for verification during callback
   const cookieStore = await cookies();
   cookieStore.set(OAUTH_STATE_COOKIE, state, {
+    ...COOKIE_OPTIONS,
+    maxAge: 60 * 10, // 10 minutes (GitHub OAuth callback should complete quickly)
+  });
+  
+  cookieStore.set(OAUTH_CODE_VERIFIER_COOKIE, codeVerifier, {
     ...COOKIE_OPTIONS,
     maxAge: 60 * 10, // 10 minutes
   });
@@ -193,13 +205,20 @@ async function handleCallback(
 
   // Clear state cookie
   cookieStore.delete(OAUTH_STATE_COOKIE);
+  
+  // Get PKCE code verifier if it was used
+  const codeVerifier = cookieStore.get(OAUTH_CODE_VERIFIER_COOKIE)?.value;
+  if (codeVerifier) {
+    cookieStore.delete(OAUTH_CODE_VERIFIER_COOKIE);
+  }
 
   try {
-    // Exchange code for token
+    // Exchange code for token (with PKCE code verifier if available)
     const { accessToken } = await exchangeCodeForToken(
       code,
       GITHUB_CLIENT_ID,
-      GITHUB_CLIENT_SECRET
+      GITHUB_CLIENT_SECRET,
+      codeVerifier || undefined
     );
 
     // Store token in cookie

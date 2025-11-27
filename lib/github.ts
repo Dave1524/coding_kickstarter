@@ -271,9 +271,50 @@ export function sanitizeRepoName(name: string): string {
 }
 
 /**
- * Build the GitHub OAuth authorization URL
+ * Generate PKCE code verifier and challenge
+ * Following GitHub OAuth best practices: https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
+ * PKCE uses S256 method: SHA-256 hash of code verifier, base64url encoded
  */
-export function getGitHubOAuthUrl(clientId: string, redirectUri: string, state: string): string {
+export async function generatePKCE(): Promise<{ codeVerifier: string; codeChallenge: string }> {
+  // Generate a random code verifier (43-128 characters)
+  // Using 43 characters (86 hex characters = 43 bytes) as minimum recommended
+  const array = new Uint8Array(43);
+  crypto.getRandomValues(array);
+  // Convert to base64url-safe string
+  const codeVerifier = Buffer.from(array)
+    .toString('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=/g, '')
+    .substring(0, 128); // Max 128 characters
+  
+  // Generate code challenge: SHA-256 hash of verifier, base64url encoded
+  const encoder = new TextEncoder();
+  const data = encoder.encode(codeVerifier);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const codeChallenge = Buffer.from(hashArray)
+    .toString('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=/g, ''); // Remove padding for base64url
+  
+  return {
+    codeVerifier,
+    codeChallenge,
+  };
+}
+
+/**
+ * Build the GitHub OAuth authorization URL
+ * Follows GitHub OAuth web application flow: https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#web-application-flow
+ */
+export function getGitHubOAuthUrl(
+  clientId: string, 
+  redirectUri: string, 
+  state: string,
+  codeChallenge?: string
+): string {
   const params = new URLSearchParams({
     client_id: clientId,
     redirect_uri: redirectUri,
@@ -281,29 +322,48 @@ export function getGitHubOAuthUrl(clientId: string, redirectUri: string, state: 
     state,
   });
   
+  // Add PKCE parameters if provided (strongly recommended by GitHub)
+  if (codeChallenge) {
+    params.set('code_challenge', codeChallenge);
+    params.set('code_challenge_method', 'S256'); // GitHub requires S256 (SHA-256)
+  }
+  
   return `https://github.com/login/oauth/authorize?${params.toString()}`;
 }
 
 /**
  * Exchange OAuth code for access token
+ * Follows GitHub OAuth token exchange: https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#2-users-are-redirected-back-to-your-site-by-github
  */
 export async function exchangeCodeForToken(
   code: string,
   clientId: string,
-  clientSecret: string
+  clientSecret: string,
+  codeVerifier?: string
 ): Promise<{ accessToken: string; tokenType: string; scope: string }> {
+  const body: Record<string, string> = {
+    client_id: clientId,
+    client_secret: clientSecret,
+    code,
+  };
+
+  // Add PKCE code verifier if provided
+  if (codeVerifier) {
+    body.code_verifier = codeVerifier;
+  }
+
   const response = await fetch('https://github.com/login/oauth/access_token', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Accept: 'application/json',
+      Accept: 'application/json', // Request JSON response format
     },
-    body: JSON.stringify({
-      client_id: clientId,
-      client_secret: clientSecret,
-      code,
-    }),
+    body: JSON.stringify(body),
   });
+
+  if (!response.ok) {
+    throw new Error(`Token exchange failed: ${response.status} ${response.statusText}`);
+  }
 
   const data = await response.json();
 
@@ -311,10 +371,14 @@ export async function exchangeCodeForToken(
     throw new Error(data.error_description || data.error);
   }
 
+  if (!data.access_token) {
+    throw new Error('No access token received from GitHub');
+  }
+
   return {
     accessToken: data.access_token,
-    tokenType: data.token_type,
-    scope: data.scope,
+    tokenType: data.token_type || 'bearer',
+    scope: data.scope || '',
   };
 }
 
