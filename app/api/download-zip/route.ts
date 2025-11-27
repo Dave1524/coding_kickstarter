@@ -362,7 +362,8 @@ export async function GET(request: NextRequest) {
   const zipBuffer = zip.toBuffer();
 
   // Return ZIP file
-  return new NextResponse(zipBuffer, {
+  // Convert Buffer to Uint8Array for NextResponse compatibility
+  return new NextResponse(new Uint8Array(zipBuffer), {
     status: 200,
     headers: {
       'Content-Type': 'application/zip',
