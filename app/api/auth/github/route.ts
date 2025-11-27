@@ -11,6 +11,36 @@ const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID || '';
 const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET || '';
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
+/**
+ * Get the appropriate redirect URI based on the request origin
+ * This handles both local development and production environments
+ * 
+ * IMPORTANT: The redirect URI must be registered in your GitHub OAuth app settings:
+ * - For local development: http://localhost:3000/api/auth/github
+ * - For production: https://your-domain.com/api/auth/github
+ */
+function getRedirectUri(request: NextRequest): string {
+  // Use environment variable if explicitly set for OAuth redirect
+  const oauthRedirectUri = process.env.GITHUB_REDIRECT_URI;
+  if (oauthRedirectUri) {
+    return oauthRedirectUri;
+  }
+  
+  // In production, use the configured APP_URL
+  if (process.env.NODE_ENV === 'production' && APP_URL && APP_URL !== 'http://localhost:3000') {
+    return `${APP_URL.replace(/\/$/, '')}/api/auth/github`;
+  }
+  
+  // For local development, use the request origin
+  const origin = request.nextUrl.origin;
+  if (origin) {
+    return `${origin}/api/auth/github`;
+  }
+  
+  // Fallback to default
+  return 'http://localhost:3000/api/auth/github';
+}
+
 // Cookie settings
 const GITHUB_TOKEN_COOKIE = 'github_token';
 const OAUTH_STATE_COOKIE = 'github_oauth_state';
@@ -34,11 +64,11 @@ export async function GET(request: NextRequest) {
 
   // Handle OAuth callback
   if (code || error) {
-    return handleCallback(code, state, error);
+    return handleCallback(code, state, error, request);
   }
 
   // Initiate OAuth flow
-  return initiateOAuth();
+  return initiateOAuth(request);
 }
 
 /**
@@ -103,7 +133,7 @@ export async function DELETE() {
 /**
  * Initiate the OAuth flow
  */
-async function initiateOAuth(): Promise<NextResponse> {
+async function initiateOAuth(request: NextRequest): Promise<NextResponse> {
   if (!GITHUB_CLIENT_ID) {
     return NextResponse.json(
       { error: 'GitHub OAuth is not configured' },
@@ -113,7 +143,7 @@ async function initiateOAuth(): Promise<NextResponse> {
 
   // Generate random state for CSRF protection
   const state = generateState();
-  const redirectUri = `${APP_URL}/api/auth/github`;
+  const redirectUri = getRedirectUri(request);
   const authUrl = getGitHubOAuthUrl(GITHUB_CLIENT_ID, redirectUri, state);
 
   // Store state in cookie for verification
@@ -132,9 +162,14 @@ async function initiateOAuth(): Promise<NextResponse> {
 async function handleCallback(
   code: string | null,
   state: string | null,
-  error: string | null
+  error: string | null,
+  request: NextRequest
 ): Promise<NextResponse> {
-  const redirectUrl = new URL('/', APP_URL);
+  // Determine the app URL from request for redirect
+  const appUrl = process.env.NODE_ENV === 'production' && APP_URL && APP_URL !== 'http://localhost:3000'
+    ? APP_URL
+    : request.nextUrl.origin;
+  const redirectUrl = new URL('/', appUrl);
 
   // Handle errors from GitHub
   if (error) {
