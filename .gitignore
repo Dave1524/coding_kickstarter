@@ -44,3 +44,8 @@ next-env.d.ts
 # promptfoo
 .promptfoo/
 promptfoo/output/
+
+# boilerplate template (local dev copy)
+boilerplate-template/node_modules/
+boilerplate-template/.next/
+boilerplate-template/.env*
